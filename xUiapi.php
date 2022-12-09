@@ -63,7 +63,6 @@ class xUiapi
 
     public function getCookie()
     {
-        echo $this->cookie;
         return $this->cookie;
     }
 
