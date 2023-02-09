@@ -53,6 +53,8 @@ class Base
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_COOKIEFILE => $this->getCookie(),
             CURLOPT_COOKIEJAR => $this->getCookie(),
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false
         ];
         curl_setopt_array($ch, $options);
         $StatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -76,7 +78,8 @@ class Base
 
         if (isset($this->path[$path])) {
             $urlPath = $this->path[$path];
-            if ($path == 'inbound' || $path == 'delInbound' || $path == 'updateInbound' || $path == 'installXray') {
+            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray'];
+            if (in_array($path, $arrPath)) {
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId()]);
             }
             return $this->url . $urlPath;
