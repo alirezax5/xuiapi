@@ -10,22 +10,22 @@ class HexaSoftwareTech extends Base
         return $this->curl('updateSetting', $com, true);
     }
 
-    public function addInbound($remark, $port, $protocol, $settings, $streamSettings, $sniffing = null, $expiryTime = 0, $listen = '')
+    public function addInbound($remark, $port, $protocol, $settings, $streamSettings, $total = 0, $up = 0, $down = 0, $sniffing = null, $expiryTime = 0, $listen = '')
     {
         $sniffing = $sniffing == null ? $this->defaults['sniffing'] : $sniffing;
         $sniffing = json_encode($sniffing);
         $settings = json_encode($settings);
         $streamSettings = json_encode($streamSettings);
-        return $this->curl('addInbound', compact('remark', 'port', 'protocol', 'settings', 'streamSettings', 'sniffing', 'expiryTime', 'listen'), true);
+        return $this->curl('addInbound', compact('remark', 'port', 'protocol', 'settings', 'streamSettings','total','up','down', 'sniffing', 'expiryTime', 'listen'), true);
     }
 
-    public function editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $sniffing = null, $expiryTime = 0, $listen = '')
+    public function editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total = 0, $up = 0, $down = 0, $sniffing = null, $expiryTime = 0, $listen = '')
     {
         $sniffing = $sniffing == null ? $this->defaults['sniffing'] : $sniffing;
         $sniffing = json_encode($sniffing);
         $settings = json_encode($settings);
         $streamSettings = json_encode($streamSettings);
         $this->setId($id);
-        return $this->curl('updateInbound', compact('enable', 'remark', 'port', 'protocol', 'settings', 'streamSettings', 'sniffing', 'expiryTime', 'listen'), true);
+        return $this->curl('updateInbound', compact('enable', 'remark', 'port', 'protocol', 'settings', 'streamSettings','total','up','down', 'sniffing', 'expiryTime', 'listen'), true);
     }
 }
