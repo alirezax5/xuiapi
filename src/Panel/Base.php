@@ -5,14 +5,16 @@ namespace alirezax5\XuiApi\Panel;
 
 class Base
 {
-    protected $url, $username, $password, $id, $cookie;
+    protected $url, $username, $password, $id, $cookie, $client;
     protected $path = [
         'login' => '/login',
         'status' => '/server/status',
         'restartXrayService' => '/server/restartXrayService',
         'stopXrayService' => '/server/stopXrayService',
         'getXrayVersion' => '/server/getXrayVersion',
-        'installXray' => 'server/installXray/{id}',
+        'installXray' => '/server/installXray/{id}',
+        'logs' => '/server/logs',
+        'restartPanel' => '/setting/restartPanel',
         'allSetting' => '/xui/setting/all',
         'updateSetting' => '/xui/setting/update',
         'updateUser' => '/xui/setting/updateUser',
@@ -21,6 +23,10 @@ class Base
         'delInbound' => '/xui/inbound/del/{id}',
         'updateInbound' => '/xui/inbound/update/{id}',
         'addInbound' => '/xui/inbound/add',
+        'addClient' => '/xui/inbound/addClient',
+        'delClient' => '/xui/inbound/delClient/{id}',
+        'resetClientTraffic' => '/xui/inbound/{id}/resetClientTraffic/{client}',
+        'updateClient' => '/xui/inbound/updateClient/{id}',
     ];
     protected $defaults = [
         'sniffing' => [
@@ -62,6 +68,11 @@ class Base
         return json_decode($res, true);
     }
 
+    public function jsonEncode($json)
+    {
+        return json_encode($json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
     protected function setId($id)
     {
         $this->id = $id;
@@ -73,14 +84,29 @@ class Base
         return $this->id;
     }
 
+    protected function setClient($client)
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+    protected function getClient(): int
+    {
+        return $this->client;
+    }
+
     protected function getUrl($path): string
     {
 
         if (isset($this->path[$path])) {
             $urlPath = $this->path[$path];
-            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray'];
+            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'delClient'];
+            $arrPathWithClient = ['resetClientTraffic'];
             if (in_array($path, $arrPath)) {
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId()]);
+            }
+            if (in_array($path, $arrPathWithClient)) {
+                $urlPath = strtr($this->path[$path], ['{id}' => $this->getId(), ['{client}' => $this->getClient()]]);
             }
             return $this->url . $urlPath;
         }
@@ -156,6 +182,11 @@ class Base
     public function getXrayVersion()
     {
         return $this->curl('getXrayVersion', [], true);
+    }
+
+    public function restartPanel()
+    {
+        return $this->curl('restartPanel', [], true);
     }
 
     public function installXray($version = 'v1.6.4')
