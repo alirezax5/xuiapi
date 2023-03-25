@@ -50,7 +50,7 @@ class MHSanaei extends Base
     public function updateClient($id, $client, $settings)
     {
         $this->setId($client);
-        return $this->curl('delClient', compact('id', 'settings'));
+        return $this->curl('updateClient', compact('id', 'settings'));
     }
     public function logs()
     {
