@@ -23,7 +23,7 @@ class Base
         'delInbound' => '/xui/inbound/del/{id}',
         'updateInbound' => '/xui/inbound/update/{id}',
         'addInbound' => '/xui/inbound/add',
-        'addClient' => '/xui/inbound/addClient',
+        'addClient' => '/xui/inbound/addClient/',
         'delClient' => '/xui/inbound/delClient/{id}',
         'resetClientTraffic' => '/xui/inbound/{id}/resetClientTraffic/{client}',
         'updateClient' => '/xui/inbound/updateClient/{id}',
@@ -100,13 +100,13 @@ class Base
 
         if (isset($this->path[$path])) {
             $urlPath = $this->path[$path];
-            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'delClient'];
+            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray','delClient'];
             $arrPathWithClient = ['resetClientTraffic'];
             if (in_array($path, $arrPath)) {
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId()]);
             }
             if (in_array($path, $arrPathWithClient)) {
-                $urlPath = strtr($this->path[$path], ['{id}' => $this->getId(), ['{client}' => $this->getClient()]]);
+                $urlPath = strtr($this->path[$path], ['{id}' => $this->getId(),['{client}'=>$this->getClient()]]);
             }
             return $this->url . $urlPath;
         }
@@ -183,7 +183,6 @@ class Base
     {
         return $this->curl('getXrayVersion', [], true);
     }
-
     public function restartPanel()
     {
         return $this->curl('restartPanel', [], true);
