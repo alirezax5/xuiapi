@@ -5,7 +5,7 @@
     "autoload": {
         "psr-4": {
             "alirezax5\\XuiApi\\": "src/",
-            "alirezax5\\XuiApi\\Panel\\": "src/Panel"
+            "alirezax5\\XuiApi\\Traits\\": "src/Traits"
         }
     },
     "authors": [
@@ -14,5 +14,7 @@
             "email": "alirezaaghax6@gmail.com"
         }
     ],
-    "require": {}
+    "require": {
+        "alirezax5/x-convert": "^1.0.0"
+    }
 }
