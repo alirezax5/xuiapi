@@ -116,8 +116,6 @@ class MHSanaei extends Base
         $expiryTime = $list['expiryTime'];
         $listen = $list['listen'];
         $total = $list['total'];
-
-
         return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
     }
 
@@ -125,7 +123,7 @@ class MHSanaei extends Base
     {
         $this->setId($id);
         $this->setClient($client);
-        return $this->curl('addClient');
+        return $this->curl('resetClientTraffic');
     }
 
     public function delClient($id, $client, $settings)
@@ -137,7 +135,7 @@ class MHSanaei extends Base
     public function updateClient($id, $client, $settings)
     {
         $this->setId($client);
-        return $this->curl('delClient', compact('id', 'settings'));
+        return $this->curl('updateClient', compact('id', 'settings'));
     }
 
     public function logs()
