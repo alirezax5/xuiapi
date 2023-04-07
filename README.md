@@ -32,4 +32,4 @@ print_r($xui->listInbound());
 ```
 
 ## Example
-Coming soon
+[view Example](https://github.com/alirezax5/xuiapi/tree/main/Examples)
