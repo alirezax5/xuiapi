@@ -108,7 +108,6 @@ class Base
             if (in_array($path, $arrPathWithClient)) {
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId(),'{client}'=>$this->getClient()]);
             }
-            print_r( $this->url . $urlPath);
             return $this->url . $urlPath;
         }
 
