@@ -90,7 +90,7 @@ class Base
         return $this;
     }
 
-    protected function getClient(): int
+    protected function getClient()
     {
         return $this->client;
     }
@@ -106,8 +106,9 @@ class Base
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId()]);
             }
             if (in_array($path, $arrPathWithClient)) {
-                $urlPath = strtr($this->path[$path], ['{id}' => $this->getId(),['{client}'=>$this->getClient()]]);
+                $urlPath = strtr($this->path[$path], ['{id}' => $this->getId(),'{client}'=>$this->getClient()]);
             }
+            print_r( $this->url . $urlPath);
             return $this->url . $urlPath;
         }
 
