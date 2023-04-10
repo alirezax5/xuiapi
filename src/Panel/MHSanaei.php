@@ -72,6 +72,115 @@ class MHSanaei extends Base
 
     }
 
+
+    public function enableClient($id, $uuid)
+    {
+        $list = $this->list(['id' => $id])[0];
+        $enable = (bool)$list['enable'];
+        $remark = $list['remark'];
+        $port = $list['port'];
+        $protocol = $list['protocol'];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
+        if ($cIndex === false)
+            return false;
+        $settings['clients'][$cIndex]['enable'] = true;
+        $streamSettings = json_decode($list['streamSettings']);
+        $up = $list['up'];
+        $down = $list['down'];
+        $sniffing = json_decode($list['sniffing']);
+        $expiryTime = $list['expiryTime'];
+        $listen = $list['listen'];
+        $total = $list['total'];
+
+
+        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+
+    }
+
+    public function enableClientByEmail($id, $email)
+    {
+        $list = $this->list(['id' => $id])[0];
+        $enable = (bool)$list['enable'];
+        $remark = $list['remark'];
+        $port = $list['port'];
+        $protocol = $list['protocol'];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
+        if ($cIndex === false)
+            return false;
+        $settings['clients'][$cIndex]['enable'] = true;
+        $streamSettings = json_decode($list['streamSettings']);
+        $up = $list['up'];
+        $down = $list['down'];
+        $sniffing = json_decode($list['sniffing']);
+        $expiryTime = $list['expiryTime'];
+        $listen = $list['listen'];
+        $total = $list['total'];
+        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+
+    }
+
+    public function getClientIP($email)
+    {
+        $this->setId($email);
+        return $this->curl('clientIps', true);
+    }
+
+    public function clearClientIP($email)
+    {
+        $this->setId($email);
+        return $this->curl('clearClientIps', true);
+    }
+
+    public function disableClientByEmail($id, $email)
+    {
+        $list = $this->list(['id' => $id])[0];
+        $enable = (bool)$list['enable'];
+        $remark = $list['remark'];
+        $port = $list['port'];
+        $protocol = $list['protocol'];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
+        if ($cIndex === false)
+            return false;
+        $settings['clients'][$cIndex]['enable'] = false;
+        $streamSettings = json_decode($list['streamSettings']);
+        $up = $list['up'];
+        $down = $list['down'];
+        $sniffing = json_decode($list['sniffing']);
+        $expiryTime = $list['expiryTime'];
+        $listen = $list['listen'];
+        $total = $list['total'];
+        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+
+    }
+
+    public function disableClient($id, $uuid)
+    {
+        $list = $this->list(['id' => $id])[0];
+        $enable = (bool)$list['enable'];
+        $remark = $list['remark'];
+        $port = $list['port'];
+        $protocol = $list['protocol'];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
+        if ($cIndex === false)
+            return false;
+        $settings['clients'][$cIndex]['enable'] = false;
+        $streamSettings = json_decode($list['streamSettings']);
+        $up = $list['up'];
+        $down = $list['down'];
+        $sniffing = json_decode($list['sniffing']);
+        $expiryTime = $list['expiryTime'];
+        $listen = $list['listen'];
+        $total = $list['total'];
+
+
+        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+
+    }
+
     public function editClientTraffic($id, $uuid, $gb)
     {
         $list = $this->list(['id' => $id])[0];
@@ -96,6 +205,7 @@ class MHSanaei extends Base
         return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
 
     }
+
 
     public function editClientTrafficByEmail($id, $email, $gb)
     {

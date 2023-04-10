@@ -27,6 +27,8 @@ class Base
         'delClient' => '/xui/inbound/delClient/{id}',
         'resetClientTraffic' => '/xui/inbound/{id}/resetClientTraffic/{client}',
         'updateClient' => '/xui/inbound/updateClient/{id}',
+        'clientIps' => '/xui/inbound/{id}',
+        'clearClientIps' => '/xui/clearClientIps/{id}',
     ];
     protected $defaults = [
         'sniffing' => [
@@ -100,7 +102,7 @@ class Base
 
         if (isset($this->path[$path])) {
             $urlPath = $this->path[$path];
-            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray','delClient'];
+            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray','delClient','clientIps','clearClientIps'];
             $arrPathWithClient = ['resetClientTraffic'];
             if (in_array($path, $arrPath)) {
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId()]);
