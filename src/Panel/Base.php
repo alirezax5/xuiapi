@@ -27,7 +27,7 @@ class Base
         'delClient' => '/xui/inbound/delClient/{id}',
         'resetClientTraffic' => '/xui/inbound/{id}/resetClientTraffic/{client}',
         'updateClient' => '/xui/inbound/updateClient/{id}',
-        'clientIps' => '/xui/inbound/{id}',
+        'clientIps' => '/xui/inbound/clientIps/{id}',
         'clearClientIps' => '/xui/clearClientIps/{id}',
     ];
     protected $defaults = [
@@ -81,7 +81,7 @@ class Base
         return $this;
     }
 
-    protected function getId(): int
+    protected function getId()
     {
         return $this->id;
     }
