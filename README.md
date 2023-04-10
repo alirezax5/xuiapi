@@ -19,6 +19,12 @@ It is a web service project to manage the x-ui panel
 ``
 composer require alirezax5/xuiapi
 ``
+## Panels
+- [vaxilu](https://github.com/vaxilu/x-ui) =>  [Vaxilu.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/Vaxilu.php)
+- [FranzKafkaYu](https://github.com/FranzKafkaYu/x-ui) =>  [FranzKafkaYu.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/FranzKafkaYu.php)
+- [HexaSoftwareTech](https://github.com/HexaSoftwareTech/x-ui) =>  [HexaSoftwareTech.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/HexaSoftwareTech.php)
+- [MHSanaei](https://github.com/MHSanaei/x-ui) , [alireza0](https://github.com/alireza0/x-ui) =>  [MHSanaei.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/MHSanaei.php)
+- [NidukaAkalanka](https://github.com/NidukaAkalanka/x-ui-english) =>  [HexaSoftwareTech.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/NidukaAkalanka.php)
 
 ## Use  
 ```php 
