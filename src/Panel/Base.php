@@ -29,6 +29,10 @@ class Base
         'updateClient' => '/xui/inbound/updateClient/{id}',
         'clientIps' => '/xui/inbound/clientIps/{id}',
         'clearClientIps' => '/xui/clearClientIps/{id}',
+        'apiMHSanaei_list'=>'/xui/API/inbounds/list/',
+        'apiMHSanaei_get'=>'/xui/API/inbounds/get/{id}',
+        'apiMHSanaei_get'=>'/xui/API/inbounds/get/{id}',
+        'apiMHSanaei_resetAllClientTraffics'=>'/xui/API/inbounds/resetAllClientTraffics/{id}',
     ];
     protected $defaults = [
         'sniffing' => [
@@ -102,7 +106,7 @@ class Base
 
         if (isset($this->path[$path])) {
             $urlPath = $this->path[$path];
-            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray','delClient','clientIps','clearClientIps'];
+            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray','delClient','clientIps','clearClientIps','apiMHSanaei_get','apiMHSanaei_resetAllClientTraffics'];
             $arrPathWithClient = ['resetClientTraffic'];
             if (in_array($path, $arrPath)) {
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId()]);

@@ -253,4 +253,20 @@ class MHSanaei extends Base
         return $this->curl('logs');
     }
 
+    public function getListsApi()
+    {
+        return $this->curl('apiMHSanaei_list', [], false);
+    }
+
+    public function getApi($id)
+    {
+        $this->setId($id);
+        return $this->curl('apiMHSanaei_get', [], false);
+    }
+
+    public function resetAllClientTrafficsApi($id)
+    {
+        $this->setId($id);
+        return $this->curl('apiMHSanaei_resetAllClientTraffics', []);
+    }
 }
