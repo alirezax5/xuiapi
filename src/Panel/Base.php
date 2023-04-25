@@ -31,7 +31,6 @@ class Base
         'clearClientIps' => '/xui/clearClientIps/{id}',
         'apiMHSanaei_list'=>'/xui/API/inbounds/list/',
         'apiMHSanaei_get'=>'/xui/API/inbounds/get/{id}',
-        'apiMHSanaei_get'=>'/xui/API/inbounds/get/{id}',
         'apiMHSanaei_resetAllClientTraffics'=>'/xui/API/inbounds/resetAllClientTraffics/{id}',
     ];
     protected $defaults = [
