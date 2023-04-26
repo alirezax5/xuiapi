@@ -272,6 +272,6 @@ class MHSanaei extends Base
     public function delDepletedClientsApi($id)
     {
         $this->setId($id);
-        return $this->curl('apiMHSanaei_resetAllClientTraffics', []);
+        return $this->curl('apiMHSanaei_delDepletedClients', []);
     }
 }
