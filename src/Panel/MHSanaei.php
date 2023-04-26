@@ -269,4 +269,9 @@ class MHSanaei extends Base
         $this->setId($id);
         return $this->curl('apiMHSanaei_resetAllClientTraffics', []);
     }
+    public function delDepletedClientsApi($id)
+    {
+        $this->setId($id);
+        return $this->curl('apiMHSanaei_resetAllClientTraffics', []);
+    }
 }
