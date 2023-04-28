@@ -53,7 +53,67 @@ class HexaSoftwareTech extends Base
         return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
 
     }
+    public function editClient($inboundId, $clientUuid, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $limitIp = 0, $fingerprint = 'chrome', $flow = '')
+    {
+        $list = $this->list(['id' => $inboundId])[0];
+        $enable = (bool)$list['enable'];
+        $remark = $list['remark'];
+        $port = $list['port'];
+        $protocol = $list['protocol'];
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settings['clients'], $clientUuid);
+        if ($cIndex === false)
+            return false;
+        $settings['clients'][$cIndex]['enable'] = $enableClient;
+        $settings['clients'][$cIndex][$idKey] = $uuid;
+        $settings['clients'][$cIndex]['flow'] = $flow;
+        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($totalGB, 'GB', 'B');
+        $settings['clients'][$cIndex]['email'] = $email;
+        $settings['clients'][$cIndex]['limitIp'] = $limitIp;
+        $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
+        $settings['clients'][$cIndex]['fingerprint'] = $fingerprint;
 
+        $streamSettings = json_decode($list['streamSettings']);
+        $up = $list['up'];
+        $down = $list['down'];
+        $sniffing = json_decode($list['sniffing']);
+        $expiryTime = $list['expiryTime'];
+        $listen = $list['listen'];
+        $total = $list['total'];
+        return $this->editInbound($enable, $inboundId, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+
+    }
+
+    public function editClientByEmail($inboundId, $clientEmail, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $limitIp = 0, $fingerprint = 'chrome', $flow = '')
+    {
+        $list = $this->list(['id' => $inboundId])[0];
+        $enable = (bool)$list['enable'];
+        $remark = $list['remark'];
+        $port = $list['port'];
+        $protocol = $list['protocol'];
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settings['clients'], $clientEmail);
+        if ($cIndex === false)
+            return false;
+        $settings['clients'][$cIndex]['enable'] = $enableClient;
+        $settings['clients'][$cIndex][$idKey] = $uuid;
+        $settings['clients'][$cIndex]['flow'] = $flow;
+        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($totalGB, 'GB', 'B');
+        $settings['clients'][$cIndex]['email'] = $email;
+        $settings['clients'][$cIndex]['limitIp'] = $limitIp;
+        $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
+        $settings['clients'][$cIndex]['fingerprint'] = $fingerprint;
+        $streamSettings = json_decode($list['streamSettings']);
+        $up = $list['up'];
+        $down = $list['down'];
+        $sniffing = json_decode($list['sniffing']);
+        $expiryTime = $list['expiryTime'];
+        $listen = $list['listen'];
+        $total = $list['total'];
+        return $this->editInbound($enable, $inboundId, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+    }
     public function editClientTraffic($id, $uuid, $gb)
     {
         $list = $this->list(['id' => $id])[0];

@@ -29,10 +29,10 @@ class Base
         'updateClient' => '/xui/inbound/updateClient/{id}',
         'clientIps' => '/xui/inbound/clientIps/{id}',
         'clearClientIps' => '/xui/clearClientIps/{id}',
-        'apiMHSanaei_list'=>'/xui/API/inbounds/list/',
-        'apiMHSanaei_get'=>'/xui/API/inbounds/get/{id}',
-        'apiMHSanaei_resetAllClientTraffics'=>'/xui/API/inbounds/resetAllClientTraffics/{id}',
-        'apiMHSanaei_delDepletedClients'=>'/xui/API/inbounds/delDepletedClients/{id}',
+        'apiMHSanaei_list' => '/xui/API/inbounds/list/',
+        'apiMHSanaei_get' => '/xui/API/inbounds/get/{id}',
+        'apiMHSanaei_resetAllClientTraffics' => '/xui/API/inbounds/resetAllClientTraffics/{id}',
+        'apiMHSanaei_delDepletedClients' => '/xui/API/inbounds/delDepletedClients/{id}',
     ];
     protected $defaults = [
         'sniffing' => [
@@ -106,13 +106,13 @@ class Base
 
         if (isset($this->path[$path])) {
             $urlPath = $this->path[$path];
-            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray','delClient','clientIps','clearClientIps','apiMHSanaei_get','apiMHSanaei_resetAllClientTraffics','apiMHSanaei_delDepletedClients'];
+            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'delClient', 'clientIps', 'clearClientIps', 'apiMHSanaei_get', 'apiMHSanaei_resetAllClientTraffics', 'apiMHSanaei_delDepletedClients'];
             $arrPathWithClient = ['resetClientTraffic'];
             if (in_array($path, $arrPath)) {
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId()]);
             }
             if (in_array($path, $arrPathWithClient)) {
-                $urlPath = strtr($this->path[$path], ['{id}' => $this->getId(),'{client}'=>$this->getClient()]);
+                $urlPath = strtr($this->path[$path], ['{id}' => $this->getId(), '{client}' => $this->getClient()]);
             }
             return $this->url . $urlPath;
         }
@@ -189,6 +189,7 @@ class Base
     {
         return $this->curl('getXrayVersion', [], true);
     }
+
     public function restartPanel()
     {
         return $this->curl('restartPanel', [], true);
@@ -232,9 +233,76 @@ class Base
         return $this->curl('updateUser', compact('oldPassword', 'oldUsername', 'newPassword', 'newUsername'), true);
     }
 
+    public function editInboundDataWithKey($id, $key, $value)
+    {
+        $list = $this->list(['id' => $id])[0];
+        if (isset($list[$key]))
+            $list[$key] = $value;
+        $enable = (bool)$list['enable'];
+        $remark = $list['remark'];
+        $port = $list['port'];
+        $protocol = $list['protocol'];
+        $settings = json_decode($list["settings"], true);
+        $streamSettings = json_decode($list['streamSettings']);
+        $up = $list['up'];
+        $down = $list['down'];
+        $sniffing = json_decode($list['sniffing']);
+        $expiryTime = $list['expiryTime'];
+        $listen = $list['listen'];
+        $total = $list['total'];
+        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+    }
+
     public function removeInbound($id)
     {
         $this->setId($id);
         return $this->curl('delInbound', [], true);
     }
+
+    public function editClientWithKey($inboundId, $clientUuid, $key, $value)
+    {
+        $list = $this->list(['id' => $inboundId])[0];
+        $enable = (bool)$list['enable'];
+        $remark = $list['remark'];
+        $port = $list['port'];
+        $protocol = $list['protocol'];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settings['clients'], $clientUuid);
+        if ($cIndex === false)
+            return false;
+        if (isset($settings['clients'][$cIndex][$key]))
+            $settings['clients'][$cIndex][$key] = $value;
+        $streamSettings = json_decode($list['streamSettings']);
+        $up = $list['up'];
+        $down = $list['down'];
+        $sniffing = json_decode($list['sniffing']);
+        $expiryTime = $list['expiryTime'];
+        $listen = $list['listen'];
+        $total = $list['total'];
+        return $this->editInbound($enable, $inboundId, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+    }
+
+    public function editClientByEmailWithKey($inboundId, $clientEmail, $key, $value)
+    {
+        $list = $this->list(['id' => $inboundId])[0];
+        $enable = (bool)$list['enable'];
+        $remark = $list['remark'];
+        $port = $list['port'];
+        $protocol = $list['protocol'];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settings['clients'], $clientEmail);
+        if ($cIndex === false)
+            return false;
+        if (isset($settings['clients'][$cIndex][$key]))
+            $settings['clients'][$cIndex][$key] = $value;
+        $streamSettings = json_decode($list['streamSettings']);
+        $up = $list['up'];
+        $down = $list['down'];
+        $sniffing = json_decode($list['sniffing']);
+        $expiryTime = $list['expiryTime'];
+        $listen = $list['listen'];
+        $total = $list['total'];
+        return $this->editInbound($enable, $inboundId, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+    }
+
 }
