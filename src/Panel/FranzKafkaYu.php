@@ -163,6 +163,32 @@ class FranzKafkaYu extends Base
         return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
     }
 
+    public function getClientData($inboundId, $uuid)
+    {
+        $list = $this->list(['id' => $inboundId])[0];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
+        if ($cIndex === false)
+            return false;
+
+        return $settings['clients'][$cIndex];
+    }
+
+    public function getClientDataByEmail($inboundId, $email)
+    {
+        $list = $this->list(['id' => $inboundId]);
+        if ($list == false) {
+            return false;
+        }
+        $list = $list[0];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
+        if ($cIndex === false)
+            return false;
+
+        return $settings['clients'][$cIndex];
+    }
+
     public function editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total = 0, $up = 0, $down = 0, $autoreset = false, $ipalert = false, $iplimit = 0, $sniffing = null, $expiryTime = 0, $listen = '')
     {
         $sniffing = $sniffing == null ? $this->defaults['sniffing'] : $sniffing;

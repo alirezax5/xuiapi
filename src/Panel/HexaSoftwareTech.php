@@ -53,6 +53,33 @@ class HexaSoftwareTech extends Base
         return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
 
     }
+
+    public function getClientData($inboundId, $uuid)
+    {
+        $list = $this->list(['id' => $inboundId])[0];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
+        if ($cIndex === false)
+            return false;
+
+        return $settings['clients'][$cIndex];
+    }
+
+    public function getClientDataByEmail($inboundId, $email)
+    {
+        $list = $this->list(['id' => $inboundId]);
+        if ($list == false) {
+            return false;
+        }
+        $list = $list[0];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
+        if ($cIndex === false)
+            return false;
+
+        return $settings['clients'][$cIndex];
+    }
+
     public function editClient($inboundId, $clientUuid, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $limitIp = 0, $fingerprint = 'chrome', $flow = '')
     {
         $list = $this->list(['id' => $inboundId])[0];
@@ -114,6 +141,7 @@ class HexaSoftwareTech extends Base
         $total = $list['total'];
         return $this->editInbound($enable, $inboundId, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
     }
+
     public function editClientTraffic($id, $uuid, $gb)
     {
         $list = $this->list(['id' => $id])[0];

@@ -73,7 +73,7 @@ class MHSanaei extends Base
 
     }
 
-    public function editClient($inboundId, $clientUuid, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $tgId = '', $subId = '', $limitIp = 0,$fingerprint =  'chrome', $flow = '')
+    public function editClient($inboundId, $clientUuid, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $tgId = '', $subId = '', $limitIp = 0, $fingerprint = 'chrome', $flow = '')
     {
         $list = $this->list(['id' => $inboundId])[0];
         $enable = (bool)$list['enable'];
@@ -107,7 +107,7 @@ class MHSanaei extends Base
 
     }
 
-    public function editClientByEmail($inboundId, $clientEmail, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $tgId = '', $subId = '', $limitIp = 0,$fingerprint =  'chrome', $flow = '')
+    public function editClientByEmail($inboundId, $clientEmail, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $tgId = '', $subId = '', $limitIp = 0, $fingerprint = 'chrome', $flow = '')
     {
         $list = $this->list(['id' => $inboundId])[0];
         $enable = (bool)$list['enable'];
@@ -198,6 +198,32 @@ class MHSanaei extends Base
     {
         $this->setId($email);
         return $this->curl('clearClientIps', true);
+    }
+
+    public function getClientData($inboundId, $uuid)
+    {
+        $list = $this->list(['id' => $inboundId])[0];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
+        if ($cIndex === false)
+            return false;
+
+        return $settings['clients'][$cIndex];
+    }
+
+    public function getClientDataByEmail($inboundId, $email)
+    {
+        $list = $this->list(['id' => $inboundId]);
+        if ($list == false){
+            return false;
+        }
+        $list = $list[0];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
+        if ($cIndex === false)
+            return false;
+
+        return $settings['clients'][$cIndex];
     }
 
     public function disableClientByEmail($id, $email)
@@ -341,5 +367,11 @@ class MHSanaei extends Base
     {
         $this->setId($id);
         return $this->curl('apiMHSanaei_delDepletedClients', []);
+    }
+
+    public function getClientTraffics($email)
+    {
+        $this->setId($email);
+        return $this->curl('apiMHSanaei_getClientTraffics', []);
     }
 }
