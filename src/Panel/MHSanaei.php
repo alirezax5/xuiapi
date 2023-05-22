@@ -8,6 +8,7 @@ use alirezax5\XuiApi\Traits\Additions;
 class MHSanaei extends Base
 {
     use Additions;
+
     protected $path = [
         'login' => '/login',
         'status' => '/server/status',
@@ -37,6 +38,7 @@ class MHSanaei extends Base
         'apiMHSanaei_delDepletedClients' => '/panel/API/inbounds/delDepletedClients/{id}',
         'apiMHSanaei_getClientTraffics' => '/panel/API/inbounds/getClientTraffics/{id}',
     ];
+
     public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $timeLocation = 'Asia/Tehran', $webListen = '')
     {
         $com = compact('webPort', 'webCertFile', 'webKeyFile', 'webBasePath', 'xrayTemplateConfig', 'tgBotEnable', 'tgExpireDiff', 'tgTrafficDiff', 'tgCpu', 'tgBotToken', 'tgBotChatId', 'tgRunTime', 'timeLocation', 'webListen', 'tgBotBackup');
@@ -71,14 +73,8 @@ class MHSanaei extends Base
 
     public function addnewClient($id, $uuid, $email, $flow = '', $totalgb = 0, $eT = 0, $limitIp = 0, $fingerprint = 'chrome', $isTrojan = false)
     {
-        $list = $this->list(['id' => $id])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
-        $protocol = $list['protocol'];
-        $settings = json_decode($list["settings"], true);
 
-        $settings['clients'][] = [
+        $settings = ['clients' => [[
             $isTrojan == true ? 'password' : 'id' => $uuid,
             'email' => $email,
             'flow' => $flow,
@@ -86,18 +82,10 @@ class MHSanaei extends Base
             'expiryTime' => $eT,
             'limitIp' => $limitIp,
             'fingerprint' => $fingerprint
-
+        ]]
         ];
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
 
-
-        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+        return $this->addClient($id, $settings);
 
     }
 
@@ -242,7 +230,7 @@ class MHSanaei extends Base
     public function getClientDataByEmail($inboundId, $email)
     {
         $list = $this->list(['id' => $inboundId]);
-        if ($list == false){
+        if ($list == false) {
             return false;
         }
         $list = $list[0];
