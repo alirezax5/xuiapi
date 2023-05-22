@@ -45,6 +45,17 @@ class Base
         ],
     ];
 
+    /**
+     * Calculates sum of squares of an array
+     *
+     * Loops over each element in the array, squares it, and adds it to
+     * total. Returns total.
+     *
+     * This function can also be implemented using array_reduce();
+     *
+     * @access public
+     * @param array $url
+     */
     public function __construct($url, $username, $password)
     {
         $this->url = $url;

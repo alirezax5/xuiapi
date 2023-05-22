@@ -5,38 +5,10 @@ namespace alirezax5\XuiApi\Panel;
 use alirezax5\XConvert\XConvert;
 use alirezax5\XuiApi\Traits\Additions;
 
-class MHSanaei extends Base
+class Alireza0 extends Base
 {
     use Additions;
-    protected $path = [
-        'login' => '/login',
-        'status' => '/server/status',
-        'restartXrayService' => '/server/restartXrayService',
-        'stopXrayService' => '/server/stopXrayService',
-        'getXrayVersion' => '/server/getXrayVersion',
-        'installXray' => '/server/installXray/{id}',
-        'logs' => '/server/logs',
-        'restartPanel' => '/setting/restartPanel',
-        'allSetting' => '/panel/setting/all',
-        'updateSetting' => '/panel/setting/update',
-        'updateUser' => '/panel/setting/updateUser',
-        'listInbound' => '/panel/inbound/list',
-        'inbound' => '/panel/inbound/get/{id}',
-        'delInbound' => '/panel/inbound/del/{id}',
-        'updateInbound' => '/panel/inbound/update/{id}',
-        'addInbound' => '/panel/inbound/add',
-        'addClient' => '/panel/inbound/addClient/',
-        'delClient' => '/panel/inbound/delClient/{id}',
-        'resetClientTraffic' => '/panel/inbound/{id}/resetClientTraffic/{client}',
-        'updateClient' => '/panel/inbound/updateClient/{id}',
-        'clientIps' => '/panel/inbound/clientIps/{id}',
-        'clearClientIps' => '/panel/clearClientIps/{id}',
-        'apiMHSanaei_list' => '/panel/API/inbounds/list/',
-        'apiMHSanaei_get' => '/panel/API/inbounds/get/{id}',
-        'apiMHSanaei_resetAllClientTraffics' => '/panel/API/inbounds/resetAllClientTraffics/{id}',
-        'apiMHSanaei_delDepletedClients' => '/panel/API/inbounds/delDepletedClients/{id}',
-        'apiMHSanaei_getClientTraffics' => '/panel/API/inbounds/getClientTraffics/{id}',
-    ];
+
     public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $timeLocation = 'Asia/Tehran', $webListen = '')
     {
         $com = compact('webPort', 'webCertFile', 'webKeyFile', 'webBasePath', 'xrayTemplateConfig', 'tgBotEnable', 'tgExpireDiff', 'tgTrafficDiff', 'tgCpu', 'tgBotToken', 'tgBotChatId', 'tgRunTime', 'timeLocation', 'webListen', 'tgBotBackup');
