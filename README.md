@@ -23,7 +23,8 @@ composer require alirezax5/xuiapi
 - [vaxilu](https://github.com/vaxilu/x-ui) =>  [Vaxilu.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/Vaxilu.php)
 - [FranzKafkaYu](https://github.com/FranzKafkaYu/x-ui) =>  [FranzKafkaYu.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/FranzKafkaYu.php)
 - [HexaSoftwareTech](https://github.com/HexaSoftwareTech/x-ui) =>  [HexaSoftwareTech.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/HexaSoftwareTech.php)
-- [MHSanaei](https://github.com/MHSanaei/3x-ui) , [alireza0](https://github.com/alireza0/x-ui) =>  [MHSanaei.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/MHSanaei.php)
+- [MHSanaei](https://github.com/MHSanaei/3x-ui)  =>  [MHSanaei.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/MHSanaei.php)
+- [alireza0](https://github.com/alireza0/x-ui) =>  [Alireza0.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/Alireza0.php)
 - [NidukaAkalanka](https://github.com/NidukaAkalanka/x-ui-english) =>  [NidukaAkalanka.php](https://github.com/alirezax5/xuiapi/blob/main/src/Panel/NidukaAkalanka.php)
 
 ## Use  
