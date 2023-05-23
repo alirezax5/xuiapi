@@ -345,15 +345,16 @@ class MHSanaei extends Base
         return $this->curl('resetClientTraffic');
     }
 
-    public function delClient($id, $client, $settings)
+    public function delClient($id, $client)
     {
         $this->setId($client);
-        return $this->curl('delClient', compact('id', 'settings'));
+        return $this->curl('delClient', compact('id'));
     }
 
     public function updateClient($id, $client, $settings)
     {
         $this->setId($client);
+        $settings = $this->jsonEncode($settings);
         return $this->curl('updateClient', compact('id', 'settings'));
     }
 
