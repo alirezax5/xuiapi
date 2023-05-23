@@ -27,16 +27,16 @@ class MHSanaei extends Base
         'updateInbound' => '/panel/inbound/update/{id}',
         'addInbound' => '/panel/inbound/add',
         'addClient' => '/panel/inbound/addClient/',
-        'delClient' => '/panel/inbound/delClient/{id}',
+        'delClient' => '/panel/inbound/{id}/delClient/{client}',
         'resetClientTraffic' => '/panel/inbound/{id}/resetClientTraffic/{client}',
         'updateClient' => '/panel/inbound/updateClient/{id}',
         'clientIps' => '/panel/inbound/clientIps/{id}',
         'clearClientIps' => '/panel/clearClientIps/{id}',
-        'apiMHSanaei_list' => '/panel/API/inbounds/list/',
-        'apiMHSanaei_get' => '/panel/API/inbounds/get/{id}',
-        'apiMHSanaei_resetAllClientTraffics' => '/panel/API/inbounds/resetAllClientTraffics/{id}',
-        'apiMHSanaei_delDepletedClients' => '/panel/API/inbounds/delDepletedClients/{id}',
-        'apiMHSanaei_getClientTraffics' => '/panel/API/inbounds/getClientTraffics/{id}',
+        'api_list' => '/panel/API/inbounds/list/',
+        'api_get' => '/panel/API/inbounds/get/{id}',
+        'api_resetAllClientTraffics' => '/panel/API/inbounds/resetAllClientTraffics/{id}',
+        'api_delDepletedClients' => '/panel/API/inbounds/delDepletedClients/{id}',
+        'api_getClientTraffics' => '/panel/API/inbounds/getClientTraffics/{id}',
     ];
 
     public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $timeLocation = 'Asia/Tehran', $webListen = '')
@@ -89,70 +89,54 @@ class MHSanaei extends Base
 
     }
 
-    public function editClient($inboundId, $clientUuid, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $tgId = '', $subId = '', $limitIp = 0, $fingerprint = 'chrome', $flow = '')
+    public function editClient($inboundId, $clientUuid, bool $enableClient, $email, $uuid, $isTrojan = false, $totalGB = 0, $expiryTime = 0, $tgId = '', $subId = '', $limitIp = 0, $fingerprint = 'chrome', $flow = '')
     {
-        $list = $this->list(['id' => $inboundId])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
-        $protocol = $list['protocol'];
-        $idKey = $protocol == 'trojan' ? 'password' : 'id';
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndex($settings['clients'], $clientUuid);
-        if ($cIndex === false)
-            return false;
-        $settings['clients'][$cIndex]['enable'] = $enableClient;
-        $settings['clients'][$cIndex][$idKey] = $uuid;
-        $settings['clients'][$cIndex]['flow'] = $flow;
-        $settings['clients'][$cIndex]['limitIp'] = $limitIp;
-        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($totalGB, 'GB', 'B');
-        $settings['clients'][$cIndex]['email'] = $email;
-        $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
-        $settings['clients'][$cIndex]['tgId'] = $tgId;
-        $settings['clients'][$cIndex]['subId'] = $subId;
-        $settings['clients'][$cIndex]['fingerprint'] = $fingerprint;
+        $settings = ['clients' => [[
+            'enable' => $enableClient,
+            $isTrojan == true ? 'password' : 'id' => $uuid,
+            'email' => $email,
+            'flow' => $flow,
+            'totalGB' => XConvert::convertFileSize($totalGB, 'GB', 'B'),
+            'expiryTime' => $expiryTime,
+            'limitIp' => $limitIp,
+            'fingerprint' => $fingerprint,
+            'tgId' => $tgId,
+            'subId' => $subId
 
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
-        return $this->editInbound($enable, $inboundId, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+        ]]
+        ];
+        return $this->updateClient($inboundId, $clientUuid, $settings);
 
     }
 
     public function editClientByEmail($inboundId, $clientEmail, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $tgId = '', $subId = '', $limitIp = 0, $fingerprint = 'chrome', $flow = '')
     {
         $list = $this->list(['id' => $inboundId])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
         $protocol = $list['protocol'];
         $idKey = $protocol == 'trojan' ? 'password' : 'id';
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndexByEmail($settings['clients'], $clientEmail);
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settingss['clients'], $clientEmail);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['enable'] = $enableClient;
-        $settings['clients'][$cIndex][$idKey] = $uuid;
-        $settings['clients'][$cIndex]['flow'] = $flow;
-        $settings['clients'][$cIndex]['limitIp'] = $limitIp;
-        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($totalGB, 'GB', 'B');
-        $settings['clients'][$cIndex]['email'] = $email;
-        $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
-        $settings['clients'][$cIndex]['tgId'] = $tgId;
-        $settings['clients'][$cIndex]['subId'] = $subId;
-        $settings['clients'][$cIndex]['fingerprint'] = $fingerprint;
 
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
+        $settings = ['clients' => [[
+            'enable' => $enableClient,
+            $protocol == 'trojan' ? 'password' : 'id' => $uuid,
+            'email' => $email,
+            'flow' => $flow,
+            'totalGB' => XConvert::convertFileSize($totalGB, 'GB', 'B'),
+            'expiryTime' => $expiryTime,
+            'limitIp' => $limitIp,
+            'fingerprint' => $fingerprint,
+            'tgId' => $tgId,
+            'subId' => $subId
+
+        ]]
+        ];
+
+
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
+
         return $this->editInbound($enable, $inboundId, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
     }
 
@@ -200,6 +184,8 @@ class MHSanaei extends Base
         $expiryTime = $list['expiryTime'];
         $listen = $list['listen'];
         $total = $list['total'];
+
+
         return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
 
     }
@@ -347,8 +333,9 @@ class MHSanaei extends Base
 
     public function delClient($id, $client)
     {
-        $this->setId($client);
-        return $this->curl('delClient', compact('id'));
+        $this->setId($id);
+        $this->setClient($client);
+        return $this->curl('delClient');
     }
 
     public function updateClient($id, $client, $settings)
@@ -365,30 +352,30 @@ class MHSanaei extends Base
 
     public function getListsApi()
     {
-        return $this->curl('apiMHSanaei_list', [], false);
+        return $this->curl('api_list', [], false);
     }
 
     public function getApi($id)
     {
         $this->setId($id);
-        return $this->curl('apiMHSanaei_get', [], false);
+        return $this->curl('api_get', [], false);
     }
 
     public function resetAllClientTrafficsApi($id)
     {
         $this->setId($id);
-        return $this->curl('apiMHSanaei_resetAllClientTraffics', []);
+        return $this->curl('api_resetAllClientTraffics', []);
     }
 
     public function delDepletedClientsApi($id)
     {
         $this->setId($id);
-        return $this->curl('apiMHSanaei_delDepletedClients', []);
+        return $this->curl('api_delDepletedClients', []);
     }
 
     public function getClientTraffics($email)
     {
         $this->setId($email);
-        return $this->curl('apiMHSanaei_getClientTraffics', []);
+        return $this->curl('api_getClientTraffics', []);
     }
 }
