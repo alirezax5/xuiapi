@@ -43,149 +43,121 @@ class Alireza0 extends Base
 
     public function addnewClient($id, $uuid, $email, $flow = '', $totalgb = 0, $eT = 0, $limitIp = 0, $fingerprint = 'chrome', $isTrojan = false)
     {
-        $list = $this->list(['id' => $id])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
-        $protocol = $list['protocol'];
-        $settings = json_decode($list["settings"], true);
 
-        $settings['clients'][] = [
+        $settings = ['clients' => [[
             $isTrojan == true ? 'password' : 'id' => $uuid,
             'email' => $email,
             'flow' => $flow,
-            'totalGB' => XConvert::convertFileSize($totalgb, 'GB', 'B'),
+            'totalGB' => $totalgb == 0 ? 0 : XConvert::convertFileSize($totalgb, 'GB', 'B'),
             'expiryTime' => $eT,
             'limitIp' => $limitIp,
             'fingerprint' => $fingerprint
-
+        ]]
         ];
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
 
-
-        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+        return $this->addClient($id, $settings);
 
     }
 
-    public function editClient($inboundId, $clientUuid, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $tgId = '', $subId = '', $limitIp = 0, $fingerprint = 'chrome', $flow = '')
+    public function editClient($inboundId, $clientUuid, bool $enableClient, $email, $uuid, $isTrojan = false, $totalGB = 0, $expiryTime = 0, $tgId = '', $subId = '', $limitIp = 0, $fingerprint = 'chrome', $flow = '')
     {
-        $list = $this->list(['id' => $inboundId])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
-        $protocol = $list['protocol'];
-        $idKey = $protocol == 'trojan' ? 'password' : 'id';
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndex($settings['clients'], $clientUuid);
-        if ($cIndex === false)
-            return false;
-        $settings['clients'][$cIndex]['enable'] = $enableClient;
-        $settings['clients'][$cIndex][$idKey] = $uuid;
-        $settings['clients'][$cIndex]['flow'] = $flow;
-        $settings['clients'][$cIndex]['limitIp'] = $limitIp;
-        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($totalGB, 'GB', 'B');
-        $settings['clients'][$cIndex]['email'] = $email;
-        $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
-        $settings['clients'][$cIndex]['tgId'] = $tgId;
-        $settings['clients'][$cIndex]['subId'] = $subId;
-        $settings['clients'][$cIndex]['fingerprint'] = $fingerprint;
 
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
-        return $this->editInbound($enable, $inboundId, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+        $settings = ['clients' => [[
+            'enable' => $enableClient,
+            $isTrojan == true ? 'password' : 'id' => $uuid,
+            'email' => $email,
+            'flow' => $flow,
+            'totalGB' => $totalGB == 0 ? 0 : XConvert::convertFileSize($totalGB, 'GB', 'B'),
+            'expiryTime' => $expiryTime,
+            'limitIp' => $limitIp,
+            'fingerprint' => $fingerprint,
+            'tgId' => $tgId,
+            'subId' => $subId
 
+        ]]
+        ];
+        return $this->updateClient($inboundId, $clientUuid, $settings);
     }
 
     public function editClientByEmail($inboundId, $clientEmail, $enableClient, $email, $uuid, $totalGB = 0, $expiryTime = 0, $tgId = '', $subId = '', $limitIp = 0, $fingerprint = 'chrome', $flow = '')
     {
         $list = $this->list(['id' => $inboundId])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
         $protocol = $list['protocol'];
         $idKey = $protocol == 'trojan' ? 'password' : 'id';
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndexByEmail($settings['clients'], $clientEmail);
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settingss['clients'], $clientEmail);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['enable'] = $enableClient;
-        $settings['clients'][$cIndex][$idKey] = $uuid;
-        $settings['clients'][$cIndex]['flow'] = $flow;
-        $settings['clients'][$cIndex]['limitIp'] = $limitIp;
-        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($totalGB, 'GB', 'B');
-        $settings['clients'][$cIndex]['email'] = $email;
-        $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
-        $settings['clients'][$cIndex]['tgId'] = $tgId;
-        $settings['clients'][$cIndex]['subId'] = $subId;
-        $settings['clients'][$cIndex]['fingerprint'] = $fingerprint;
 
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
-        return $this->editInbound($enable, $inboundId, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+        $settings = ['clients' => [[
+            'enable' => $enableClient,
+            $protocol == 'trojan' ? 'password' : 'id' => $uuid,
+            'email' => $email,
+            'flow' => $flow,
+            'totalGB' => $totalGB == 0 ? 0 : XConvert::convertFileSize($totalGB, 'GB', 'B'),
+            'expiryTime' => $expiryTime,
+            'limitIp' => $limitIp,
+            'fingerprint' => $fingerprint,
+            'tgId' => $tgId,
+            'subId' => $subId
+
+        ]]
+        ];
+
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
     }
 
-    public function enableClient($id, $uuid)
+    public function enableClient($inboundId, $uuid)
     {
-        $list = $this->list(['id' => $id])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
+        $list = $this->list(['id' => $inboundId])[0];
         $protocol = $list['protocol'];
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settingss['clients'], $uuid);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['enable'] = true;
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
+        $settings = ['clients' => [[
+            'enable' => true,
+            $protocol == 'trojan' ? 'password' : 'id' => $uuid,
+            'email' => $settingss['clients'][$cIndex]['email'],
+            'flow' => $settingss['clients'][$cIndex]['flow'],
+            'totalGB' => $settingss['clients'][$cIndex]['totalGB'],
+            'expiryTime' => $settingss['clients'][$cIndex]['expiryTime'],
+            'limitIp' => $settingss['clients'][$cIndex]['limitIp'],
+            'fingerprint' => $settingss['clients'][$cIndex]['fingerprint'],
+            'tgId' => $settingss['clients'][$cIndex]['tgId'],
+            'subId' => $settingss['clients'][$cIndex]['subId']
 
+        ]]
+        ];
 
-        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
-
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
     }
 
-    public function enableClientByEmail($id, $email)
+    public function enableClientByEmail($inboundId, $email)
     {
-        $list = $this->list(['id' => $id])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
+        $list = $this->list(['id' => $inboundId])[0];
         $protocol = $list['protocol'];
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settingss['clients'], $email);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['enable'] = true;
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
-        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+        $settings = ['clients' => [[
+            'enable' => true,
+            $protocol == 'trojan' ? 'password' : 'id' => $settingss['clients'][$cIndex][$idKey],
+            'email' => $email,
+            'flow' => $settingss['clients'][$cIndex]['flow'],
+            'totalGB' => $settingss['clients'][$cIndex]['totalGB'],
+            'expiryTime' => $settingss['clients'][$cIndex]['expiryTime'],
+            'limitIp' => $settingss['clients'][$cIndex]['limitIp'],
+            'fingerprint' => $settingss['clients'][$cIndex]['fingerprint'],
+            'tgId' => $settingss['clients'][$cIndex]['tgId'],
+            'subId' => $settingss['clients'][$cIndex]['subId']
 
+        ]]
+        ];
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
     }
 
     public function getClientIP($email)
@@ -214,7 +186,7 @@ class Alireza0 extends Base
     public function getClientDataByEmail($inboundId, $email)
     {
         $list = $this->list(['id' => $inboundId]);
-        if ($list == false){
+        if ($list == false) {
             return false;
         }
         $list = $list[0];
@@ -226,100 +198,113 @@ class Alireza0 extends Base
         return $settings['clients'][$cIndex];
     }
 
-    public function disableClientByEmail($id, $email)
+    public function disableClientByEmail($inboundId, $email)
     {
-        $list = $this->list(['id' => $id])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
+        $list = $this->list(['id' => $inboundId])[0];
         $protocol = $list['protocol'];
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settingss['clients'], $email);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['enable'] = false;
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
-        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+        $settings = ['clients' => [[
+            'enable' => false,
+            $protocol == 'trojan' ? 'password' : 'id' => $settingss['clients'][$cIndex][$idKey],
+            'email' => $email,
+            'flow' => $settingss['clients'][$cIndex]['flow'],
+            'totalGB' => $settingss['clients'][$cIndex]['totalGB'],
+            'expiryTime' => $settingss['clients'][$cIndex]['expiryTime'],
+            'limitIp' => $settingss['clients'][$cIndex]['limitIp'],
+            'fingerprint' => $settingss['clients'][$cIndex]['fingerprint'],
+            'tgId' => $settingss['clients'][$cIndex]['tgId'],
+            'subId' => $settingss['clients'][$cIndex]['subId']
+
+        ]]
+        ];
+
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
+    }
+
+    public function disableClient($inboundId, $uuid)
+    {
+        $list = $this->list(['id' => $inboundId])[0];
+        $protocol = $list['protocol'];
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settingss['clients'], $uuid);
+        if ($cIndex === false)
+            return false;
+        $settings = ['clients' => [[
+            'enable' => false,
+            $protocol == 'trojan' ? 'password' : 'id' => $uuid,
+            'email' => $settingss['clients'][$cIndex]['email'],
+            'flow' => $settingss['clients'][$cIndex]['flow'],
+            'totalGB' => $settingss['clients'][$cIndex]['totalGB'],
+            'expiryTime' => $settingss['clients'][$cIndex]['expiryTime'],
+            'limitIp' => $settingss['clients'][$cIndex]['limitIp'],
+            'fingerprint' => $settingss['clients'][$cIndex]['fingerprint'],
+            'tgId' => $settingss['clients'][$cIndex]['tgId'],
+            'subId' => $settingss['clients'][$cIndex]['subId']
+
+        ]]
+        ];
+
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
 
     }
 
-    public function disableClient($id, $uuid)
+    public function editClientTraffic($inboundId, $uuid, $gb)
     {
-        $list = $this->list(['id' => $id])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
+        $list = $this->list(['id' => $inboundId])[0];
         $protocol = $list['protocol'];
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settingss['clients'], $uuid);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['enable'] = false;
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
+        $settings = ['clients' => [[
+            'enable' => $settingss['clients'][$cIndex]['enable'],
+            $protocol == 'trojan' ? 'password' : 'id' => $uuid,
+            'email' => $settingss['clients'][$cIndex]['email'],
+            'flow' => $settingss['clients'][$cIndex]['flow'],
+            'totalGB' => $gb == 0 ? 0 : XConvert::convertFileSize($gb, 'GB', 'B'),
+            'expiryTime' => $settingss['clients'][$cIndex]['expiryTime'],
+            'limitIp' => $settingss['clients'][$cIndex]['limitIp'],
+            'fingerprint' => $settingss['clients'][$cIndex]['fingerprint'],
+            'tgId' => $settingss['clients'][$cIndex]['tgId'],
+            'subId' => $settingss['clients'][$cIndex]['subId']
 
+        ]]
+        ];
 
-        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
-
-    }
-
-    public function editClientTraffic($id, $uuid, $gb)
-    {
-        $list = $this->list(['id' => $id])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
-        $protocol = $list['protocol'];
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
-        if ($cIndex === false)
-            return false;
-        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($gb, 'GB', 'B');
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
-
-
-        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
-
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
     }
 
 
-    public function editClientTrafficByEmail($id, $email, $gb)
+    public function editClientTrafficByEmail($inboundId, $email, $gb)
     {
-        $list = $this->list(['id' => $id])[0];
-        $enable = (bool)$list['enable'];
-        $remark = $list['remark'];
-        $port = $list['port'];
+        $list = $this->list(['id' => $inboundId])[0];
         $protocol = $list['protocol'];
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settingss['clients'], $email);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($gb, 'GB', 'B');
-        $streamSettings = json_decode($list['streamSettings']);
-        $up = $list['up'];
-        $down = $list['down'];
-        $sniffing = json_decode($list['sniffing']);
-        $expiryTime = $list['expiryTime'];
-        $listen = $list['listen'];
-        $total = $list['total'];
-        return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
+        $settings = ['clients' => [[
+            'enable' => true,
+            $protocol == 'trojan' ? 'password' : 'id' => $settingss['clients'][$cIndex][$idKey],
+            'email' => $email,
+            'flow' => $settingss['clients'][$cIndex]['flow'],
+            'totalGB' => $gb == 0 ? 0 : XConvert::convertFileSize($gb, 'GB', 'B'),
+            'expiryTime' => $settingss['clients'][$cIndex]['expiryTime'],
+            'limitIp' => $settingss['clients'][$cIndex]['limitIp'],
+            'fingerprint' => $settingss['clients'][$cIndex]['fingerprint'],
+            'tgId' => $settingss['clients'][$cIndex]['tgId'],
+            'subId' => $settingss['clients'][$cIndex]['subId']
+
+        ]]
+        ];
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
     }
 
     public function resetClientTraffic($id, $client)
@@ -338,6 +323,7 @@ class Alireza0 extends Base
     public function updateClient($id, $client, $settings)
     {
         $this->setId($client);
+        $settings = $this->jsonEncode($settings);
         return $this->curl('updateClient', compact('id', 'settings'));
     }
 
@@ -367,6 +353,22 @@ class Alireza0 extends Base
     {
         $this->setId($id);
         return $this->curl('apiMHSanaei_delDepletedClients', []);
+    }
+
+    public function delAllDepletedClientsApi()
+    {
+        $this->setId('-1');
+        return $this->curl('api_delDepletedClients', []);
+    }
+
+    public function getDb()
+    {
+        return $this->curl('getDb', []);
+    }
+
+    public function getConfigJson()
+    {
+        return $this->curl('getConfigJson', []);
     }
 
     public function getClientTraffics($email)

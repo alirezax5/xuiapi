@@ -9,6 +9,8 @@ class Base
     protected $path = [
         'login' => '/login',
         'status' => '/server/status',
+        'getConfigJson' => '/server/getConfigJson',
+        'getDb' => '/server/getDb',
         'restartXrayService' => '/server/restartXrayService',
         'stopXrayService' => '/server/stopXrayService',
         'getXrayVersion' => '/server/getXrayVersion',
@@ -45,17 +47,6 @@ class Base
         ],
     ];
 
-    /**
-     * Calculates sum of squares of an array
-     *
-     * Loops over each element in the array, squares it, and adds it to
-     * total. Returns total.
-     *
-     * This function can also be implemented using array_reduce();
-     *
-     * @access public
-     * @param array $url
-     */
     public function __construct($url, $username, $password)
     {
         $this->url = $url;
@@ -118,8 +109,8 @@ class Base
 
         if (isset($this->path[$path])) {
             $urlPath = $this->path[$path];
-            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'delClient', 'clientIps', 'clearClientIps', 'apiMHSanaei_get', 'apiMHSanaei_resetAllClientTraffics', 'apiMHSanaei_delDepletedClients', 'apiMHSanaei_getClientTraffics'];
-            $arrPathWithClient = ['resetClientTraffic'];
+            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'apiMHSanaei_get', 'apiMHSanaei_resetAllClientTraffics', 'apiMHSanaei_delDepletedClients', 'apiMHSanaei_getClientTraffics'];
+            $arrPathWithClient = ['resetClientTraffic', 'delClient'];
             if (in_array($path, $arrPath)) {
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId()]);
             }
