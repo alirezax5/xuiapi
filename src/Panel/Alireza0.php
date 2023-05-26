@@ -387,7 +387,7 @@ class Alireza0 extends Base
         return $this->delClient($inboundId, $uuid);
     }
 
-    public function removeClientByEmail($inboundId, $Email)
+    public function removeClientByEmail($inboundId, $email)
     {
 
         $list = $this->list(['id' => $inboundId])[0];
