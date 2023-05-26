@@ -17,18 +17,18 @@ class Alireza0 extends Base
     public function addInbound($remark, $port, $protocol, $settings, $streamSettings, $total = 0, $up = 0, $down = 0, $sniffing = null, $expiryTime = 0, $listen = '')
     {
         $sniffing = $sniffing == null ? $this->defaults['sniffing'] : $sniffing;
-        $sniffing = json_encode($sniffing);
-        $settings = json_encode($settings);
-        $streamSettings = json_encode($streamSettings);
+        $sniffing = $this->jsonEncode($sniffing);
+        $settings = $this->jsonEncode($settings);
+        $streamSettings = $this->jsonEncode($streamSettings);
         return $this->curl('addInbound', compact('remark', 'port', 'protocol', 'settings', 'streamSettings', 'total', 'up', 'down', 'sniffing', 'expiryTime', 'listen'), true);
     }
 
     public function editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total = 0, $up = 0, $down = 0, $sniffing = null, $expiryTime = 0, $listen = '')
     {
         $sniffing = $sniffing == null ? $this->defaults['sniffing'] : $sniffing;
-        $sniffing = json_encode($sniffing);
-        $settings = json_encode($settings);
-        $streamSettings = json_encode($streamSettings);
+        $sniffing = $this->jsonEncode($sniffing);
+        $settings = $this->jsonEncode($settings);
+        $streamSettings = $this->jsonEncode($streamSettings);
         $this->setId($id);
         return $this->curl('updateInbound', compact('enable', 'remark', 'port', 'protocol', 'settings', 'streamSettings', 'total', 'up', 'down', 'sniffing', 'expiryTime', 'listen'), true);
     }
@@ -313,10 +313,11 @@ class Alireza0 extends Base
         return $this->curl('resetClientTraffic');
     }
 
-    public function delClient($id, $client, $settings)
+    public function delClient($id, $client)
     {
-        $this->setId($client);
-        return $this->curl('delClient', compact('id', 'settings'));
+        $this->setId($id);
+        $this->setClient($client);
+        return $this->curl('delClient');
     }
 
     public function updateClient($id, $client, $settings)
@@ -375,8 +376,28 @@ class Alireza0 extends Base
         $this->setId($email);
         return $this->curl('apiMHSanaei_getClientTraffics', []);
     }
+
     public function getNewX25519Cert($email)
     {
         return $this->curl('getNewX25519Cert', []);
+    }
+
+    public function removeClient($inboundId, $uuid)
+    {
+        return $this->delClient($inboundId, $uuid);
+    }
+
+    public function removeClientByEmail($inboundId, $Email)
+    {
+
+        $list = $this->list(['id' => $inboundId])[0];
+        $protocol = $list['protocol'];
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settingss['clients'], $email);
+        if ($cIndex === false)
+            return false;
+
+        return $this->delClient($inboundId, $settingss['clients'][$cIndex][$idKey]);
     }
 }

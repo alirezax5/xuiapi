@@ -41,18 +41,18 @@ class MHSanaei extends Base
         'updateUser' => '/panel/setting/updateUser',
     ];
 
-    public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $tgLang = 'fa_IR',$secretEnable = false,$subEnable = false,$subListen= '',$subPort = '2096',$subPath = 'sub/',$subDomain = '',$subCertFile='',$subKeyFile='',$subUpdates ='12', $timeLocation = 'Asia/Tehran', $webListen = '')
+    public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $tgLang = 'fa_IR', $secretEnable = false, $subEnable = false, $subListen = '', $subPort = '2096', $subPath = 'sub/', $subDomain = '', $subCertFile = '', $subKeyFile = '', $subUpdates = '12', $timeLocation = 'Asia/Tehran', $webListen = '')
     {
-        $com = compact('webPort', 'webCertFile', 'webKeyFile', 'webBasePath', 'xrayTemplateConfig', 'tgBotEnable', 'tgExpireDiff', 'tgTrafficDiff', 'tgCpu', 'tgBotToken', 'tgBotChatId', 'tgRunTime', 'timeLocation', 'webListen', 'tgBotBackup','tgLang','secretEnable','subEnable','subListen','subPort','subPath','subDomain','subCertFile','subKeyFile','subUpdates');
+        $com = compact('webPort', 'webCertFile', 'webKeyFile', 'webBasePath', 'xrayTemplateConfig', 'tgBotEnable', 'tgExpireDiff', 'tgTrafficDiff', 'tgCpu', 'tgBotToken', 'tgBotChatId', 'tgRunTime', 'timeLocation', 'webListen', 'tgBotBackup', 'tgLang', 'secretEnable', 'subEnable', 'subListen', 'subPort', 'subPath', 'subDomain', 'subCertFile', 'subKeyFile', 'subUpdates');
         return $this->curl('updateSetting', $com, true);
     }
 
     public function addInbound($remark, $port, $protocol, $settings, $streamSettings, $total = 0, $up = 0, $down = 0, $sniffing = null, $expiryTime = 0, $listen = '')
     {
         $sniffing = $sniffing == null ? $this->defaults['sniffing'] : $sniffing;
-        $sniffing = json_encode($sniffing);
-        $settings = json_encode($settings);
-        $streamSettings = json_encode($streamSettings);
+        $sniffing = $this->jsonEncode($sniffing);
+        $settings = $this->jsonEncode($settings);
+        $streamSettings = $this->jsonEncode($streamSettings);
         return $this->curl('addInbound', compact('remark', 'port', 'protocol', 'settings', 'streamSettings', 'total', 'up', 'down', 'sniffing', 'expiryTime', 'listen'), true);
     }
 
@@ -139,9 +139,9 @@ class MHSanaei extends Base
     public function editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total = 0, $up = 0, $down = 0, $sniffing = null, $expiryTime = 0, $listen = '')
     {
         $sniffing = $sniffing == null ? $this->defaults['sniffing'] : $sniffing;
-        $sniffing = json_encode($sniffing);
-        $settings = json_encode($settings);
-        $streamSettings = json_encode($streamSettings);
+        $sniffing = $this->jsonEncode($sniffing);
+        $settings = $this->jsonEncode($settings);
+        $streamSettings = $this->jsonEncode($streamSettings);
         $this->setId($id);
         return $this->curl('updateInbound', compact('enable', 'remark', 'port', 'protocol', 'settings', 'streamSettings', 'total', 'up', 'down', 'sniffing', 'expiryTime', 'listen'), true);
     }
@@ -260,7 +260,8 @@ class MHSanaei extends Base
         ]]
         ];
 
-        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);}
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
+    }
 
     public function disableClient($inboundId, $uuid)
     {
@@ -390,6 +391,7 @@ class MHSanaei extends Base
         $this->setId('-1');
         return $this->curl('api_delDepletedClients', []);
     }
+
     public function getDb()
     {
         return $this->curl('getDb', []);
@@ -399,13 +401,34 @@ class MHSanaei extends Base
     {
         return $this->curl('getConfigJson', []);
     }
+
     public function getClientTraffics($email)
     {
         $this->setId($email);
         return $this->curl('api_getClientTraffics', []);
     }
+
     public function getNewX25519Cert($email)
     {
         return $this->curl('getNewX25519Cert', []);
+    }
+
+    public function removeClient($inboundId, $uuid)
+    {
+        return $this->delClient($inboundId, $uuid);
+    }
+
+    public function removeClientByEmail($inboundId, $Email)
+    {
+
+        $list = $this->list(['id' => $inboundId])[0];
+        $protocol = $list['protocol'];
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settingss['clients'], $email);
+        if ($cIndex === false)
+            return false;
+
+        return $this->delClient($inboundId, $settingss['clients'][$cIndex][$idKey]);
     }
 }
