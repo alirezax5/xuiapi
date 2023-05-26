@@ -2,7 +2,6 @@
 
 namespace alirezax5\XuiApi\Panel;
 
-use alirezax5\XConvert\XConvert;
 use alirezax5\XuiApi\Traits\Additions;
 
 class FranzKafkaYu extends Base
@@ -37,7 +36,7 @@ class FranzKafkaYu extends Base
             $isTrojan == true ? 'password' : 'id' => $uuid,
             'email' => $email,
             'flow' => $flow,
-            'total' => XConvert::convertFileSize($totalgb, 'GB', 'B'),
+            'total' => $totalgb,
             'expiryTime' => $eT,
             'fingerprint' => $fingerprint
         ];
@@ -69,7 +68,7 @@ class FranzKafkaYu extends Base
         $settings['clients'][$cIndex]['enable'] = $enableClient;
         $settings['clients'][$cIndex][$idKey] = $uuid;
         $settings['clients'][$cIndex]['flow'] = $flow;
-        $settings['clients'][$cIndex]['total'] = XConvert::convertFileSize($totalGB, 'GB', 'B');
+        $settings['clients'][$cIndex]['total'] = $totalGB;
         $settings['clients'][$cIndex]['email'] = $email;
         $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
         $settings['clients'][$cIndex]['fingerprint'] = $fingerprint;
@@ -100,7 +99,7 @@ class FranzKafkaYu extends Base
         $settings['clients'][$cIndex]['enable'] = $enableClient;
         $settings['clients'][$cIndex][$idKey] = $uuid;
         $settings['clients'][$cIndex]['flow'] = $flow;
-        $settings['clients'][$cIndex]['total'] = XConvert::convertFileSize($totalGB, 'GB', 'B');
+        $settings['clients'][$cIndex]['total'] = $totalGB;
         $settings['clients'][$cIndex]['email'] = $email;
         $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
         $settings['clients'][$cIndex]['fingerprint'] = $fingerprint;
@@ -125,7 +124,7 @@ class FranzKafkaYu extends Base
         $cIndex = $this->getClientIndex($settings['clients'], $uuid);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['total'] = XConvert::convertFileSize($gb, 'GB', 'B');
+        $settings['clients'][$cIndex]['total'] = $gb;
         $streamSettings = json_decode($list['streamSettings']);
         $up = $list['up'];
         $down = $list['down'];
@@ -150,7 +149,7 @@ class FranzKafkaYu extends Base
         $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['total'] = XConvert::convertFileSize($gb, 'GB', 'B');
+        $settings['clients'][$cIndex]['total'] = $gb;
         $streamSettings = json_decode($list['streamSettings']);
         $up = $list['up'];
         $down = $list['down'];

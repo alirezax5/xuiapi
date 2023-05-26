@@ -11,6 +11,7 @@ class Base
         'status' => '/server/status',
         'getConfigJson' => '/server/getConfigJson',
         'getDb' => '/server/getDb',
+        'getNewX25519Cert' => '/server/getNewX25519Cert',
         'restartXrayService' => '/server/restartXrayService',
         'stopXrayService' => '/server/stopXrayService',
         'getXrayVersion' => '/server/getXrayVersion',

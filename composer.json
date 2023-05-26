@@ -15,6 +15,5 @@
         }
     ],
     "require": {
-        "alirezax5/x-convert": "^1.0.0"
     }
 }

@@ -2,7 +2,6 @@
 
 namespace alirezax5\XuiApi\Panel;
 
-use alirezax5\XConvert\XConvert;
 use alirezax5\XuiApi\Traits\Additions;
 
 class NidukaAkalanka extends Base
@@ -27,7 +26,7 @@ class NidukaAkalanka extends Base
             $isTrojan == true ? 'password' : 'id' => $uuid,
             'email' => $email,
             'flow' => $flow,
-            'totalGB' => XConvert::convertFileSize($totalgb, 'GB', 'B'),
+            'totalGB' => $totalgb,
             'expiryTime' => $eT,
             'limitIp' => $limitIp,
             'fingerprint' => $fingerprint
@@ -87,7 +86,7 @@ class NidukaAkalanka extends Base
         $settings['clients'][$cIndex]['enable'] = $enableClient;
         $settings['clients'][$cIndex][$idKey] = $uuid;
         $settings['clients'][$cIndex]['flow'] = $flow;
-        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($totalGB, 'GB', 'B');
+        $settings['clients'][$cIndex]['totalGB'] = $totalGB;
         $settings['clients'][$cIndex]['email'] = $email;
         $settings['clients'][$cIndex]['limitIp'] = $limitIp;
         $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
@@ -119,7 +118,7 @@ class NidukaAkalanka extends Base
         $settings['clients'][$cIndex]['enable'] = $enableClient;
         $settings['clients'][$cIndex][$idKey] = $uuid;
         $settings['clients'][$cIndex]['flow'] = $flow;
-        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($totalGB, 'GB', 'B');
+        $settings['clients'][$cIndex]['totalGB'] = $totalGB;
         $settings['clients'][$cIndex]['email'] = $email;
         $settings['clients'][$cIndex]['limitIp'] = $limitIp;
         $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
@@ -145,7 +144,7 @@ class NidukaAkalanka extends Base
         $cIndex = $this->getClientIndex($settings['clients'], $uuid);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($gb, 'GB', 'B');
+        $settings['clients'][$cIndex]['totalGB'] = $gb;
         $streamSettings = json_decode($list['streamSettings']);
         $up = $list['up'];
         $down = $list['down'];
@@ -170,7 +169,7 @@ class NidukaAkalanka extends Base
         $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
         if ($cIndex === false)
             return false;
-        $settings['clients'][$cIndex]['totalGB'] = XConvert::convertFileSize($gb, 'GB', 'B');
+        $settings['clients'][$cIndex]['totalGB'] = $gb;
         $streamSettings = json_decode($list['streamSettings']);
         $up = $list['up'];
         $down = $list['down'];

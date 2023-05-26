@@ -2,7 +2,6 @@
 
 namespace alirezax5\XuiApi\Panel;
 
-use alirezax5\XConvert\XConvert;
 use alirezax5\XuiApi\Traits\Additions;
 
 class MHSanaei extends Base
@@ -13,6 +12,7 @@ class MHSanaei extends Base
         'addClient' => '/panel/inbound/addClient/',
         'addInbound' => '/panel/inbound/add',
         'allSetting' => '/panel/setting/all',
+        'getNewX25519Cert' => '/server/getNewX25519Cert',
         'api_delDepletedClients' => '/panel/API/inbounds/delDepletedClients/{id}',
         'api_get' => '/panel/API/inbounds/get/{id}',
         'api_getClientTraffics' => '/panel/API/inbounds/getClientTraffics/{id}',
@@ -63,7 +63,7 @@ class MHSanaei extends Base
             $isTrojan == true ? 'password' : 'id' => $uuid,
             'email' => $email,
             'flow' => $flow,
-            'totalGB' => $totalgb == 0 ? 0 : XConvert::convertFileSize($totalgb, 'GB', 'B'),
+            'totalGB' => $totalgb,
             'expiryTime' => $eT,
             'limitIp' => $limitIp,
             'fingerprint' => $fingerprint
@@ -87,7 +87,7 @@ class MHSanaei extends Base
             $isTrojan == true ? 'password' : 'id' => $uuid,
             'email' => $email,
             'flow' => $flow,
-            'totalGB' => $totalGB == 0 ? 0 : XConvert::convertFileSize($totalGB, 'GB', 'B'),
+            'totalGB' => $totalGB,
             'expiryTime' => $expiryTime,
             'limitIp' => $limitIp,
             'fingerprint' => $fingerprint,
@@ -122,7 +122,7 @@ class MHSanaei extends Base
             $protocol == 'trojan' ? 'password' : 'id' => $uuid,
             'email' => $email,
             'flow' => $flow,
-            'totalGB' => $totalGB == 0 ? 0 : XConvert::convertFileSize($totalGB, 'GB', 'B'),
+            'totalGB' => $totalGB,
             'expiryTime' => $expiryTime,
             'limitIp' => $limitIp,
             'fingerprint' => $fingerprint,
@@ -303,7 +303,7 @@ class MHSanaei extends Base
             $protocol == 'trojan' ? 'password' : 'id' => $uuid,
             'email' => $settingss['clients'][$cIndex]['email'],
             'flow' => $settingss['clients'][$cIndex]['flow'],
-            'totalGB' => $gb == 0 ? 0 : XConvert::convertFileSize($gb, 'GB', 'B'),
+            'totalGB' => $gb,
             'expiryTime' => $settingss['clients'][$cIndex]['expiryTime'],
             'limitIp' => $settingss['clients'][$cIndex]['limitIp'],
             'fingerprint' => $settingss['clients'][$cIndex]['fingerprint'],
@@ -331,7 +331,7 @@ class MHSanaei extends Base
             $protocol == 'trojan' ? 'password' : 'id' => $settingss['clients'][$cIndex][$idKey],
             'email' => $email,
             'flow' => $settingss['clients'][$cIndex]['flow'],
-            'totalGB' => $gb == 0 ? 0 : XConvert::convertFileSize($gb, 'GB', 'B'),
+            'totalGB' => $gb,
             'expiryTime' => $settingss['clients'][$cIndex]['expiryTime'],
             'limitIp' => $settingss['clients'][$cIndex]['limitIp'],
             'fingerprint' => $settingss['clients'][$cIndex]['fingerprint'],
@@ -403,5 +403,9 @@ class MHSanaei extends Base
     {
         $this->setId($email);
         return $this->curl('api_getClientTraffics', []);
+    }
+    public function getNewX25519Cert($email)
+    {
+        return $this->curl('getNewX25519Cert', []);
     }
 }
