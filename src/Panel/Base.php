@@ -32,21 +32,19 @@ class Base
         'updateClient' => '/xui/inbound/updateClient/{id}',
         'clientIps' => '/xui/inbound/clientIps/{id}',
         'clearClientIps' => '/xui/clearClientIps/{id}',
-        'apiMHSanaei_list' => '/xui/API/inbounds/list/',
-        'apiMHSanaei_get' => '/xui/API/inbounds/get/{id}',
-        'apiMHSanaei_resetAllClientTraffics' => '/xui/API/inbounds/resetAllClientTraffics/{id}',
-        'apiMHSanaei_delDepletedClients' => '/xui/API/inbounds/delDepletedClients/{id}',
-        'apiMHSanaei_getClientTraffics' => '/xui/API/inbounds/getClientTraffics/{id}',
     ];
     protected $defaults = [
         'sniffing' => [
             "enabled" => true,
             "destOverride" => [
                 "http",
-                "tls"
+                "tls",
+                "quic"
             ]
         ],
     ];
+    protected $endpointWithId = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps'];
+    protected $endpointWithClient = ['resetClientTraffic', 'delClient'];
 
     public function __construct($url, $username, $password)
     {
@@ -110,16 +108,15 @@ class Base
 
         if (isset($this->path[$path])) {
             $urlPath = $this->path[$path];
-            $arrPath = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'apiMHSanaei_get', 'apiMHSanaei_resetAllClientTraffics', 'apiMHSanaei_delDepletedClients', 'apiMHSanaei_getClientTraffics'];
-            $arrPathWithClient = ['resetClientTraffic', 'delClient'];
-            if (in_array($path, $arrPath)) {
+            if (in_array($path, $this->endpointWithId)) {
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId()]);
             }
-            if (in_array($path, $arrPathWithClient)) {
+            if (in_array($path, $this->endpointWithClient)) {
                 $urlPath = strtr($this->path[$path], ['{id}' => $this->getId(), '{client}' => $this->getClient()]);
             }
             return $this->url . $urlPath;
         }
+
 
         return $this->url;
     }
@@ -145,7 +142,9 @@ class Base
 
     protected function resetCookieFile()
     {
-        unlink($this->cookie);
+        if ($this->checkCookieFile())
+            unlink($this->cookie);
+
         $this->initCookieFile();
         return $this;
     }
@@ -299,6 +298,8 @@ class Base
             return false;
         if (isset($settings['clients'][$cIndex][$key]))
             $settings['clients'][$cIndex][$key] = $value;
+
+        print_r($settings['clients'][$cIndex][$key]);
         $streamSettings = json_decode($list['streamSettings']);
         $up = $list['up'];
         $down = $list['down'];

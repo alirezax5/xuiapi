@@ -110,8 +110,6 @@ trait Additions
         $expiryTime = $list['expiryTime'];
         $listen = $list['listen'];
         $total = $list['total'];
-
-
         return $this->editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total, $up, $down, $sniffing, $expiryTime, $listen);
     }
 

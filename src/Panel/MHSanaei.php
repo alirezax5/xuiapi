@@ -40,6 +40,7 @@ class MHSanaei extends Base
         'updateSetting' => '/panel/setting/update',
         'updateUser' => '/panel/setting/updateUser',
     ];
+    protected $endpointWithId  =  ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'api_get', 'api_resetAllClientTraffics', 'api_delDepletedClients', 'api_getClientTraffics'];
 
     public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $tgLang = 'fa_IR', $secretEnable = false, $subEnable = false, $subListen = '', $subPort = '2096', $subPath = 'sub/', $subDomain = '', $subCertFile = '', $subKeyFile = '', $subUpdates = '12', $timeLocation = 'Asia/Tehran', $webListen = '')
     {
@@ -350,6 +351,18 @@ class MHSanaei extends Base
         $this->setClient($client);
         return $this->curl('resetClientTraffic');
     }
+    public function resetClientTrafficByUuid($id, $uuid)
+    {
+        $list = $this->list(['id' => $id])[0];
+        $protocol = $list['protocol'];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
+        if ($cIndex === false)
+            return false;
+        $this->setId($id);
+        $this->setClient($settings['clients'][$cIndex]['email']);
+        return $this->curl('resetClientTraffic');
+    }
 
     public function delClient($id, $client)
     {
@@ -408,7 +421,7 @@ class MHSanaei extends Base
         return $this->curl('api_getClientTraffics', []);
     }
 
-    public function getNewX25519Cert($email)
+    public function getNewX25519Cert()
     {
         return $this->curl('getNewX25519Cert', []);
     }

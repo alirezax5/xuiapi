@@ -8,6 +8,40 @@ class Alireza0 extends Base
 {
     use Additions;
 
+    protected $path = [
+        'login' => '/login',
+        'status' => '/server/status',
+        'getConfigJson' => '/server/getConfigJson',
+        'getDb' => '/server/getDb',
+        'getNewX25519Cert' => '/server/getNewX25519Cert',
+        'restartXrayService' => '/server/restartXrayService',
+        'stopXrayService' => '/server/stopXrayService',
+        'getXrayVersion' => '/server/getXrayVersion',
+        'installXray' => '/server/installXray/{id}',
+        'logs' => '/server/logs',
+        'restartPanel' => '/setting/restartPanel',
+        'allSetting' => '/xui/setting/all',
+        'updateSetting' => '/xui/setting/update',
+        'updateUser' => '/xui/setting/updateUser',
+        'listInbound' => '/xui/inbound/list',
+        'inbound' => '/xui/inbound/get/{id}',
+        'delInbound' => '/xui/inbound/del/{id}',
+        'updateInbound' => '/xui/inbound/update/{id}',
+        'addInbound' => '/xui/inbound/add',
+        'addClient' => '/xui/inbound/addClient/',
+        'delClient' => '/xui/inbound/delClient/{id}',
+        'resetClientTraffic' => '/xui/inbound/{id}/resetClientTraffic/{client}',
+        'updateClient' => '/xui/inbound/updateClient/{id}',
+        'clientIps' => '/xui/inbound/clientIps/{id}',
+        'clearClientIps' => '/xui/clearClientIps/{id}',
+        'api_list' => '/xui/API/inbounds/list/',
+        'api_get' => '/xui/API/inbounds/get/{id}',
+        'api_resetAllClientTraffics' => '/xui/API/inbounds/resetAllClientTraffics/{id}',
+        'api_delDepletedClients' => '/xui/API/inbounds/delDepletedClients/{id}',
+        'api_getClientTraffics' => '/xui/API/inbounds/getClientTraffics/{id}',
+    ];
+    protected $endpointWithId = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'api_get', 'api_resetAllClientTraffics', 'api_delDepletedClients', 'api_getClientTraffics'];
+
     public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $timeLocation = 'Asia/Tehran', $webListen = '')
     {
         $com = compact('webPort', 'webCertFile', 'webKeyFile', 'webBasePath', 'xrayTemplateConfig', 'tgBotEnable', 'tgExpireDiff', 'tgTrafficDiff', 'tgCpu', 'tgBotToken', 'tgBotChatId', 'tgRunTime', 'timeLocation', 'webListen', 'tgBotBackup');
@@ -313,6 +347,19 @@ class Alireza0 extends Base
         return $this->curl('resetClientTraffic');
     }
 
+    public function resetClientTrafficByUuid($id, $uuid)
+    {
+        $list = $this->list(['id' => $id])[0];
+        $protocol = $list['protocol'];
+        $settings = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
+        if ($cIndex === false)
+            return false;
+        $this->setId($id);
+        $this->setClient($settings['clients'][$cIndex]['email']);
+        return $this->curl('resetClientTraffic');
+    }
+
     public function delClient($id, $client)
     {
         $this->setId($id);
@@ -334,25 +381,25 @@ class Alireza0 extends Base
 
     public function getListsApi()
     {
-        return $this->curl('apiMHSanaei_list', [], false);
+        return $this->curl('api_list', [], false);
     }
 
     public function getApi($id)
     {
         $this->setId($id);
-        return $this->curl('apiMHSanaei_get', [], false);
+        return $this->curl('api_get', [], false);
     }
 
     public function resetAllClientTrafficsApi($id)
     {
         $this->setId($id);
-        return $this->curl('apiMHSanaei_resetAllClientTraffics', []);
+        return $this->curl('api_resetAllClientTraffics', []);
     }
 
     public function delDepletedClientsApi($id)
     {
         $this->setId($id);
-        return $this->curl('apiMHSanaei_delDepletedClients', []);
+        return $this->curl('api_delDepletedClients', []);
     }
 
     public function delAllDepletedClientsApi()
@@ -374,10 +421,10 @@ class Alireza0 extends Base
     public function getClientTraffics($email)
     {
         $this->setId($email);
-        return $this->curl('apiMHSanaei_getClientTraffics', []);
+        return $this->curl('api_getClientTraffics', []);
     }
 
-    public function getNewX25519Cert($email)
+    public function getNewX25519Cert()
     {
         return $this->curl('getNewX25519Cert', []);
     }
