@@ -40,7 +40,7 @@ class MHSanaei extends Base
         'updateSetting' => '/panel/setting/update',
         'updateUser' => '/panel/setting/updateUser',
     ];
-    protected $endpointWithId  =  ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'api_get', 'api_resetAllClientTraffics', 'api_delDepletedClients', 'api_getClientTraffics'];
+    protected $endpointWithId = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'api_get', 'api_resetAllClientTraffics', 'api_delDepletedClients', 'api_getClientTraffics'];
 
     public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $tgLang = 'fa_IR', $secretEnable = false, $subEnable = false, $subListen = '', $subPort = '2096', $subPath = 'sub/', $subDomain = '', $subCertFile = '', $subKeyFile = '', $subUpdates = '12', $timeLocation = 'Asia/Tehran', $webListen = '')
     {
@@ -48,26 +48,29 @@ class MHSanaei extends Base
         return $this->curl('updateSetting', $com, true);
     }
 
-    public function addInbound($remark, $port, $protocol, $settings, $streamSettings, $total = 0, $up = 0, $down = 0, $sniffing = null, $expiryTime = 0, $listen = '')
+    public function addInbound($remark, $port, $protocol, $settings, $streamSettings, $total = 0, $enable = true, $up = 0, $down = 0, $sniffing = null, $expiryTime = 0, $listen = '')
     {
         $sniffing = $sniffing == null ? $this->defaults['sniffing'] : $sniffing;
         $sniffing = $this->jsonEncode($sniffing);
         $settings = $this->jsonEncode($settings);
         $streamSettings = $this->jsonEncode($streamSettings);
-        return $this->curl('addInbound', compact('remark', 'port', 'protocol', 'settings', 'streamSettings', 'total', 'up', 'down', 'sniffing', 'expiryTime', 'listen'), true);
+        return $this->curl('addInbound', compact('remark', 'port', 'protocol', 'settings', 'streamSettings', 'total', 'enable', 'up', 'down', 'sniffing', 'expiryTime', 'listen'), true);
     }
 
-    public function addnewClient($id, $uuid, $email, $flow = '', $totalgb = 0, $eT = 0, $limitIp = 0, $fingerprint = 'chrome', $isTrojan = false)
+    public function addnewClient($id, $uuid, $email, $subId = '', $tgId = '', $flow = '', $totalgb = 0, $eT = 0, $limitIp = 0, $fingerprint = 'chrome', $isTrojan = false)
     {
-
+        $subId = $subId == '' ? uniqid() : $subId;
         $settings = ['clients' => [[
             $isTrojan == true ? 'password' : 'id' => $uuid,
-            'email' => $email,
+            'enable'=>true,
             'flow' => $flow,
+            'email' => $email,
             'totalGB' => $totalgb,
-            'expiryTime' => $eT,
             'limitIp' => $limitIp,
-            'fingerprint' => $fingerprint
+            'expiryTime' => $eT,
+            'fingerprint' => $fingerprint,
+            'tgId' => $tgId,
+            'subId' => $subId
         ]]
         ];
 
@@ -351,6 +354,7 @@ class MHSanaei extends Base
         $this->setClient($client);
         return $this->curl('resetClientTraffic');
     }
+
     public function resetClientTrafficByUuid($id, $uuid)
     {
         $list = $this->list(['id' => $id])[0];

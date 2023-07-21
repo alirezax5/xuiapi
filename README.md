@@ -40,3 +40,17 @@ print_r($xui->listInbound());
 
 ## Example
 [view Example](https://github.com/alirezax5/xuiapi/tree/main/Examples)
+
+
+## Donation
+USDT (ERC20)
+
+``
+0x68A7B3FbffF7DD74248CE3907EDA717fC156F407
+``
+
+TON
+
+``
+EQBnlnOGefCkwgtO7IZdOBFuoojkpKgK3mI1GmH3MH_gGx34
+``
