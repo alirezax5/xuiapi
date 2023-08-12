@@ -422,7 +422,7 @@ class MHSanaei extends Base
     public function getClientTraffics($email)
     {
         $this->setId($email);
-        return $this->curl('api_getClientTraffics', []);
+        return $this->curl('api_getClientTraffics', [],false);
     }
 
     public function getNewX25519Cert()
