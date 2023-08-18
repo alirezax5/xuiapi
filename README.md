@@ -43,10 +43,10 @@ print_r($xui->listInbound());
 
 
 ## Donation
-USDT (ERC20)
+USDT (TRC20) & TRX
 
 ``
-0x68A7B3FbffF7DD74248CE3907EDA717fC156F407
+TQk6AHMREwER9EyGzhUsVv2hUQygGMyCeT
 ``
 
 TON
