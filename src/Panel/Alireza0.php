@@ -9,36 +9,38 @@ class Alireza0 extends Base
     use Additions;
 
     protected $path = [
-        'login' => '/login',
-        'status' => '/server/status',
+        'addClient' => '/xui/inbound/addClient/',
+        'addInbound' => '/xui/inbound/add',
+        'allSetting' => '/xui/setting/all',
+        'api_delDepletedClients' => '/xui/API/inbounds/delDepletedClients/{id}',
+        'api_get' => '/xui/API/inbounds/get/{id}',
+        'api_getClientTraffics' => '/xui/API/inbounds/getClientTraffics/{id}',
+        'api_list' => '/xui/API/inbounds/list/',
+        'api_resetAllClientTraffics' => '/xui/API/inbounds/resetAllClientTraffics/{id}',
+        'clearClientIps' => '/xui/clearClientIps/{id}',
+        'clientIps' => '/xui/inbound/clientIps/{id}',
+        'delClient' => '/xui/inbound/delClient/{id}',
+        'delInbound' => '/xui/inbound/del/{id}',
         'getConfigJson' => '/server/getConfigJson',
         'getDb' => '/server/getDb',
         'getNewX25519Cert' => '/server/getNewX25519Cert',
-        'restartXrayService' => '/server/restartXrayService',
-        'stopXrayService' => '/server/stopXrayService',
         'getXrayVersion' => '/server/getXrayVersion',
+        'inbound' => '/xui/inbound/get/{id}',
         'installXray' => '/server/installXray/{id}',
+        'listInbound' => '/xui/inbound/list',
+        'login' => '/login',
         'logs' => '/server/logs',
+        'onlines' => '/xui/inbound/onlines',
+        'resetClientTraffic' => '/xui/inbound/{id}/resetClientTraffic/{client}',
         'restartPanel' => '/setting/restartPanel',
-        'allSetting' => '/xui/setting/all',
+        'restartXrayService' => '/server/restartXrayService',
+        'status' => '/server/status',
+        'stopXrayService' => '/server/stopXrayService',
+        'updateClient' => '/xui/inbound/updateClient/{id}',
+        'updateInbound' => '/xui/inbound/update/{id}',
         'updateSetting' => '/xui/setting/update',
         'updateUser' => '/xui/setting/updateUser',
-        'listInbound' => '/xui/inbound/list',
-        'inbound' => '/xui/inbound/get/{id}',
-        'delInbound' => '/xui/inbound/del/{id}',
-        'updateInbound' => '/xui/inbound/update/{id}',
-        'addInbound' => '/xui/inbound/add',
-        'addClient' => '/xui/inbound/addClient/',
-        'delClient' => '/xui/inbound/delClient/{id}',
-        'resetClientTraffic' => '/xui/inbound/{id}/resetClientTraffic/{client}',
-        'updateClient' => '/xui/inbound/updateClient/{id}',
-        'clientIps' => '/xui/inbound/clientIps/{id}',
-        'clearClientIps' => '/xui/clearClientIps/{id}',
-        'api_list' => '/xui/API/inbounds/list/',
-        'api_get' => '/xui/API/inbounds/get/{id}',
-        'api_resetAllClientTraffics' => '/xui/API/inbounds/resetAllClientTraffics/{id}',
-        'api_delDepletedClients' => '/xui/API/inbounds/delDepletedClients/{id}',
-        'api_getClientTraffics' => '/xui/API/inbounds/getClientTraffics/{id}',
+
     ];
     protected $endpointWithId = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'api_get', 'api_resetAllClientTraffics', 'api_delDepletedClients', 'api_getClientTraffics'];
 
@@ -446,5 +448,9 @@ class Alireza0 extends Base
             return false;
 
         return $this->delClient($inboundId, $settingss['clients'][$cIndex][$idKey]);
+    }
+    public function showOnlines()
+    {
+        return $this->curl('onlines', []);
     }
 }

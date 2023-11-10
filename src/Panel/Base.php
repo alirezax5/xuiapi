@@ -306,7 +306,6 @@ class Base
         if (isset($settings['clients'][$cIndex][$key]))
             $settings['clients'][$cIndex][$key] = $value;
 
-        print_r($settings['clients'][$cIndex][$key]);
         $streamSettings = json_decode($list['streamSettings']);
         $up = $list['up'];
         $down = $list['down'];

@@ -9,37 +9,36 @@ class MHSanaei extends Base
     use Additions;
 
     protected $path = [
-        'addClient' => '/xui/inbound/addClient/',
-        'addInbound' => '/xui/inbound/add',
-        'allSetting' => '/xui/setting/all',
-        'api_delDepletedClients' => '/xui/API/inbounds/delDepletedClients/{id}',
-        'api_get' => '/xui/API/inbounds/get/{id}',
-        'api_getClientTraffics' => '/xui/API/inbounds/getClientTraffics/{id}',
-        'api_list' => '/xui/API/inbounds/list/',
-        'api_resetAllClientTraffics' => '/xui/API/inbounds/resetAllClientTraffics/{id}',
-        'clearClientIps' => '/xui/clearClientIps/{id}',
-        'clientIps' => '/xui/inbound/clientIps/{id}',
-        'delClient' => '/xui/inbound/{id}/delClient/{client}',
-        'delInbound' => '/xui/inbound/del/{id}',
+        'addClient' => '/panel/inbound/addClient/',
+        'addInbound' => '/panel/inbound/add',
+        'allSetting' => '/panel/setting/all',
+        'api_delDepletedClients' => '/panel/API/inbounds/delDepletedClients/{id}',
+        'api_get' => '/panel/API/inbounds/get/{id}',
+        'api_getClientTraffics' => '/panel/API/inbounds/getClientTraffics/{id}',
+        'api_list' => '/panel/API/inbounds/list/',
+        'api_resetAllClientTraffics' => '/panel/API/inbounds/resetAllClientTraffics/{id}',
+        'clearClientIps' => '/panel/clearClientIps/{id}',
+        'clientIps' => '/panel/inbound/clientIps/{id}',
+        'delClient' => '/panel/inbound/{id}/delClient/{client}',
+        'delInbound' => '/panel/inbound/del/{id}',
         'getConfigJson' => '/server/getConfigJson',
         'getDb' => '/server/getDb',
         'getNewX25519Cert' => '/server/getNewX25519Cert',
         'getXrayVersion' => '/server/getXrayVersion',
-        'inbound' => '/xui/inbound/get/{id}',
+        'inbound' => '/panel/inbound/get/{id}',
         'installXray' => '/server/installXray/{id}',
-        'listInbound' => '/xui/inbound/list',
+        'listInbound' => '/panel/inbound/list',
         'login' => '/login',
         'logs' => '/server/logs',
-        'onlines' => '/xui/inbound/onlines',
-        'resetClientTraffic' => '/xui/inbound/{id}/resetClientTraffic/{client}',
+        'resetClientTraffic' => '/panel/inbound/{id}/resetClientTraffic/{client}',
         'restartPanel' => '/setting/restartPanel',
         'restartXrayService' => '/server/restartXrayService',
         'status' => '/server/status',
         'stopXrayService' => '/server/stopXrayService',
-        'updateClient' => '/xui/inbound/updateClient/{id}',
-        'updateInbound' => '/xui/inbound/update/{id}',
-        'updateSetting' => '/xui/setting/update',
-        'updateUser' => '/xui/setting/updateUser',
+        'updateClient' => '/panel/inbound/updateClient/{id}',
+        'updateInbound' => '/panel/inbound/update/{id}',
+        'updateSetting' => '/panel/setting/update',
+        'updateUser' => '/panel/setting/updateUser',
     ];
     protected $endpointWithId = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'api_get', 'api_resetAllClientTraffics', 'api_delDepletedClients', 'api_getClientTraffics'];
 
@@ -449,8 +448,5 @@ class MHSanaei extends Base
 
         return $this->delClient($inboundId, $settingss['clients'][$cIndex][$idKey]);
     }
-    public function showOnlines()
-    {
-        return $this->curl('onlines', []);
-    }
+
 }
