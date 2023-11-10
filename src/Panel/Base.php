@@ -73,6 +73,7 @@ class Base
         curl_setopt_array($ch, $options);
         $StatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $res = curl_exec($ch);
+
         return json_decode($res, true);
     }
 
@@ -159,16 +160,22 @@ class Base
     {
         if (!$this->checkCookieFile()) {
             $this->initCookieFile();
-            $this->curl('login', ['username' => $this->username, 'password' => $this->password]);
+            $a = $this->curl('login', ['username' => $this->username, 'password' => $this->password]);
+            if (isset($a['success']) && $a['success'] == false) {
+                die('error login');
+            }
         }
+
         return $this;
     }
 
     protected function authForce()
     {
         $this->resetCookieFile();
-        $this->curl('login', ['username' => $this->username, 'password' => $this->password]);
-
+        $a = $this->curl('login', ['username' => $this->username, 'password' => $this->password]);
+        if (isset($a['success']) && $a['success'] == false) {
+            die('error login');
+        }
         return $this;
     }
 
