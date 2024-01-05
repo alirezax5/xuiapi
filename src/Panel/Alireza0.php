@@ -19,7 +19,7 @@ class Alireza0 extends Base
         'api_resetAllClientTraffics' => '/xui/API/inbounds/resetAllClientTraffics/{id}',
         'clearClientIps' => '/xui/clearClientIps/{id}',
         'clientIps' => '/xui/inbound/clientIps/{id}',
-        'delClient' => '/xui/inbound/delClient/{id}',
+        'delClient' => '/xui/inbound/{id}/delClient/{client}',
         'delInbound' => '/xui/inbound/del/{id}',
         'getConfigJson' => '/server/getConfigJson',
         'getDb' => '/server/getDb',
@@ -56,7 +56,8 @@ class Alireza0 extends Base
         $sniffing = $this->jsonEncode($sniffing);
         $settings = $this->jsonEncode($settings);
         $streamSettings = $this->jsonEncode($streamSettings);
-        return $this->curl('addInbound', compact('remark', 'port', 'protocol', 'settings', 'streamSettings', 'total', 'up', 'down', 'sniffing', 'expiryTime', 'listen'), true);
+        $enable = true;
+        return $this->curl('addInbound', compact('enable', 'remark', 'port', 'protocol', 'settings', 'streamSettings', 'total', 'up', 'down', 'sniffing', 'expiryTime', 'listen'), true);
     }
 
     public function editInbound($enable, $id, $remark, $port, $protocol, $settings, $streamSettings, $total = 0, $up = 0, $down = 0, $sniffing = null, $expiryTime = 0, $listen = '')
@@ -423,7 +424,7 @@ class Alireza0 extends Base
     public function getClientTraffics($email)
     {
         $this->setId($email);
-        return $this->curl('api_getClientTraffics', [],false);
+        return $this->curl('api_getClientTraffics', [], false);
     }
 
     public function getNewX25519Cert()
@@ -449,6 +450,7 @@ class Alireza0 extends Base
 
         return $this->delClient($inboundId, $settingss['clients'][$cIndex][$idKey]);
     }
+
     public function showOnlines()
     {
         return $this->curl('onlines', []);
