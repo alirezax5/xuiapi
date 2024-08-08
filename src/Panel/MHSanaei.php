@@ -45,8 +45,34 @@ class MHSanaei extends Base
 
     public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $tgLang = 'fa_IR', $secretEnable = false, $subEnable = false, $subListen = '', $subPort = '2096', $subPath = 'sub/', $subDomain = '', $subCertFile = '', $subKeyFile = '', $subUpdates = '12', $timeLocation = 'Asia/Tehran', $webListen = '')
     {
-        $com = compact('webPort', 'webCertFile', 'webKeyFile', 'webBasePath', 'xrayTemplateConfig', 'tgBotEnable', 'tgExpireDiff', 'tgTrafficDiff', 'tgCpu', 'tgBotToken', 'tgBotChatId', 'tgRunTime', 'timeLocation', 'webListen', 'tgBotBackup', 'tgLang', 'secretEnable', 'subEnable', 'subListen', 'subPort', 'subPath', 'subDomain', 'subCertFile', 'subKeyFile', 'subUpdates');
-        return $this->curl('updateSetting', $com, true);
+        $settings = [
+            'webPort' => $webPort,
+            'webCertFile' => $webCertFile,
+            'webKeyFile' => $webKeyFile,
+            'webBasePath' => $webBasePath,
+            'xrayTemplateConfig' => $xrayTemplateConfig,
+            'tgBotEnable' => $tgBotEnable,
+            'tgExpireDiff' => $tgExpireDiff,
+            'tgTrafficDiff' => $tgTrafficDiff,
+            'tgCpu' => $tgCpu,
+            'tgBotToken' => $tgBotToken,
+            'tgBotChatId' => $tgBotChatId,
+            'tgRunTime' => $tgRunTime,
+            'timeLocation' => $timeLocation,
+            'webListen' => $webListen,
+            'tgBotBackup' => $tgBotBackup,
+            'tgLang' => $tgLang,
+            'secretEnable' => $secretEnable,
+            'subEnable' => $subEnable,
+            'subListen' => $subListen,
+            'subPort' => $subPort,
+            'subPath' => $subPath,
+            'subDomain' => $subDomain,
+            'subCertFile' => $subCertFile,
+            'subKeyFile' => $subKeyFile,
+            'subUpdates' => $subUpdates
+        ];
+        return $this->curl('updateSetting', $settings, true);
     }
 
     public function addInbound($remark, $port, $protocol, $settings, $streamSettings, $total = 0, $enable = true, $up = 0, $down = 0, $sniffing = null, $expiryTime = 0, $listen = '')
@@ -55,7 +81,21 @@ class MHSanaei extends Base
         $sniffing = $this->jsonEncode($sniffing);
         $settings = $this->jsonEncode($settings);
         $streamSettings = $this->jsonEncode($streamSettings);
-        return $this->curl('addInbound', compact('remark', 'port', 'protocol', 'settings', 'streamSettings', 'total', 'enable', 'up', 'down', 'sniffing', 'expiryTime', 'listen'), true);
+        $array = [
+            'remark' => $remark,
+            'port' => $port,
+            'protocol' => $protocol,
+            'settings' => $settings,
+            'streamSettings' => $streamSettings,
+            'total' => $total,
+            'enable' => $enable,
+            'up' => $up,
+            'down' => $down,
+            'sniffing' => $sniffing,
+            'expiryTime' => $expiryTime,
+            'listen' => $listen
+        ];
+        return $this->curl('addInbound', $array, true);
     }
 
     public function addNewClient($id, $uuid, $email, $subId = '', $tgId = '', $flow = '', $totalgb = 0, $eT = 0, $limitIp = 0, $fingerprint = 'chrome', $isTrojan = false)
