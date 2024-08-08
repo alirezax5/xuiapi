@@ -144,9 +144,10 @@ class MHSanaei extends Base
     }
 
 
-    public function updateClient($id, array $client, array $settings)
+    public function updateClient($id,  $client, array $settings)
     {
-        return $this->curl('updateClient', ['id' => $id, 'client' => $client, 'settings' => json_encode($settings)]);
+        $this->setId($client);
+        return $this->curl('updateClient', ['id' => $id, 'settings' => json_encode($settings)]);
     }
 
 
