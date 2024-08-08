@@ -15,6 +15,7 @@ class Alireza0 extends Base
         'api_delDepletedClients' => '/xui/API/inbounds/delDepletedClients/{id}',
         'api_get' => '/xui/API/inbounds/get/{id}',
         'api_getClientTraffics' => '/xui/API/inbounds/getClientTraffics/{id}',
+        'api_getClientTrafficsById' => '/xui/API/inbounds/getClientTrafficsById/{id}',
         'api_list' => '/xui/API/inbounds/list/',
         'api_resetAllClientTraffics' => '/xui/API/inbounds/resetAllClientTraffics/{id}',
         'clearClientIps' => '/xui/clearClientIps/{id}',
@@ -42,7 +43,7 @@ class Alireza0 extends Base
         'updateUser' => '/xui/setting/updateUser',
 
     ];
-    protected $endpointWithId = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'api_get', 'api_resetAllClientTraffics', 'api_delDepletedClients', 'api_getClientTraffics'];
+    protected $endpointWithId = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'api_get', 'api_resetAllClientTraffics', 'api_delDepletedClients', 'api_getClientTraffics','api_getClientTrafficsById'];
 
     public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $timeLocation = 'Asia/Tehran', $webListen = '')
     {
@@ -445,5 +446,9 @@ class Alireza0 extends Base
     public function showOnlines()
     {
         return $this->curl('onlines', []);
+    }
+    public function createbackup()
+    {
+        return $this->curl('createbackup', [],false);
     }
 }

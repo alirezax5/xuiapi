@@ -15,12 +15,14 @@ class MHSanaei extends Base
         'api_delDepletedClients' => '/panel/API/inbounds/delDepletedClients/{id}',
         'api_get' => '/panel/API/inbounds/get/{id}',
         'api_getClientTraffics' => '/panel/API/inbounds/getClientTraffics/{id}',
+        'api_getClientTrafficsById' => '/panel/API/inbounds/getClientTrafficsById/{id}',
         'api_list' => '/panel/API/inbounds/list/',
         'api_resetAllClientTraffics' => '/panel/API/inbounds/resetAllClientTraffics/{id}',
         'clearClientIps' => '/panel/clearClientIps/{id}',
         'clientIps' => '/panel/inbound/clientIps/{id}',
         'delClient' => '/panel/inbound/{id}/delClient/{client}',
         'delInbound' => '/panel/inbound/del/{id}',
+        'createbackup' => '/panel/inbound/createbackup',
         'getConfigJson' => '/server/getConfigJson',
         'getDb' => '/server/getDb',
         'getNewX25519Cert' => '/server/getNewX25519Cert',
@@ -41,7 +43,7 @@ class MHSanaei extends Base
         'updateSetting' => '/panel/setting/update',
         'updateUser' => '/panel/setting/updateUser',
     ];
-    protected $endpointWithId = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'api_get', 'api_resetAllClientTraffics', 'api_delDepletedClients', 'api_getClientTraffics'];
+    protected $endpointWithId = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps', 'api_get', 'api_resetAllClientTraffics', 'api_delDepletedClients', 'api_getClientTraffics', 'api_getClientTrafficsById'];
 
     public function updateSetting($webPort, $webCertFile, $webKeyFile, $webBasePath, $xrayTemplateConfig, bool $tgBotEnable = false, $tgExpireDiff = 0, $tgTrafficDiff = 0, $tgCpu = 0, string $tgBotToken = null, $tgBotChatId = null, $tgRunTime = '@daily', $tgBotBackup = false, $tgLang = 'fa_IR', $secretEnable = false, $subEnable = false, $subListen = '', $subPort = '2096', $subPath = 'sub/', $subDomain = '', $subCertFile = '', $subKeyFile = '', $subUpdates = '12', $timeLocation = 'Asia/Tehran', $webListen = '')
     {
@@ -457,6 +459,11 @@ class MHSanaei extends Base
         $this->setId($email);
         return $this->curl('api_getClientTraffics', [], false);
     }
+    public function getClientTrafficsById($id)
+    {
+        $this->setId($id);
+        return $this->curl('getClientTrafficsById', [], false);
+    }
 
     public function getNewX25519Cert()
     {
@@ -472,5 +479,9 @@ class MHSanaei extends Base
     public function showOnlines()
     {
         return $this->curl('onlines', [],);
+    }
+    public function createbackup()
+    {
+        return $this->curl('createbackup', [],false);
     }
 }
