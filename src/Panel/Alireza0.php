@@ -417,6 +417,12 @@ class Alireza0 extends Base
         return $this->curl('api_getClientTraffics', [], false);
     }
 
+    public function getClientTrafficsById($id)
+    {
+        $this->setId($id);
+        return $this->curl('api_getClientTrafficsById', [], false);
+    }
+
     public function getNewX25519Cert()
     {
         return $this->curl('getNewX25519Cert', []);
