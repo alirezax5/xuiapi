@@ -71,10 +71,9 @@ class Alireza0 extends Base
     }
 
 
-    public function addClient($id, $settings)
+    public function addClient(string $id, array $settings)
     {
-        $settings = $this->jsonEncode($settings);
-        return $this->curl('addClient', compact('id', 'settings'));
+        return $this->curl('addClient', ['id' => $id, 'settings' => json_encode($settings)]);
     }
 
     public function addnewClient($id, $uuid, $email, $flow = '', $totalgb = 0, $eT = 0, $limitIp = 0, $fingerprint = 'chrome', $isTrojan = false)

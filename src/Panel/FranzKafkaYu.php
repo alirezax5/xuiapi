@@ -16,7 +16,7 @@ class FranzKafkaYu extends Base
 
     public function addInbound($remark, $port, $protocol, $settings, $streamSettings, $total = 0, $up = 0, $down = 0, $autoreset = false, $ipalert = false, $iplimit = 0, $sniffing = null, $expiryTime = 0, $listen = '')
     {
-        $sniffing = $sniffing == null ? $this->defaults['sniffing'] : $sniffing;
+        $sniffing = $sniffing ?? $this->defaults['sniffing'];
         $sniffing = $this->jsonEncode($sniffing);
         $settings = $this->jsonEncode($settings);
         $streamSettings = $this->jsonEncode($streamSettings);
