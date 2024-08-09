@@ -75,7 +75,7 @@ class Alireza0 extends Base
     }
 
 
-    public function editInbound(bool $enable, string $id, string $remark, int $port, string $protocol,  $settings,  $streamSettings, int $total = 0, int $up = 0, int $down = 0, ?array $sniffing = null, int $expiryTime = 0, string $listen = '')
+    public function editInbound(bool $enable, string $id, string $remark, int $port, string $protocol,  $settings,  $streamSettings, int $total = 0, int $up = 0, int $down = 0,  $sniffing = null, int $expiryTime = 0, string $listen = '')
     {
         $data = [
             'enable' => $enable,
