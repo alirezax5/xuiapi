@@ -141,7 +141,7 @@ class Alireza0 extends Base
 
         return $this->updateClient($inboundId, $clientUuid, ['clients' => [$clientData]]);
     }
-    public function editClientByEmail(string $inboundId, string $clientEmail, bool $enableClient, string $email, string $uuid, int $totalGB = 0, int $expiryTime = 0, string $tgId = '', string $subId = '', int $limitIp = 0, string $fingerprint = 'chrome', string $flow = '')
+    public function editClientByEmail( $inboundId, string $clientEmail, bool $enableClient, string $email, string $uuid, int $totalGB = 0, int $expiryTime = 0, string $tgId = '', string $subId = '', int $limitIp = 0, string $fingerprint = 'chrome', string $flow = '')
     {
         $inboundData = $this->list(['id' => $inboundId])[0];
         $settings = json_decode($inboundData['settings'], true);
@@ -168,7 +168,7 @@ class Alireza0 extends Base
 
         return $this->updateClient($inboundId, $clientData[$inboundData['protocol'] === 'trojan' ? 'password' : 'id'], $settings);
     }
-    public function enableClient(string $inboundId, string $uuid)
+    public function enableClient( $inboundId, string $uuid)
     {
         $inboundData = $this->list(['id' => $inboundId])[0];
         $settings = json_decode($inboundData['settings'], true);
@@ -184,7 +184,7 @@ class Alireza0 extends Base
     }
 
 
-    public function enableClientByEmail(string $inboundId, string $email)
+    public function enableClientByEmail( $inboundId, string $email)
     {
         $inboundData = $this->list(['id' => $inboundId])[0];
         $settings = json_decode($inboundData['settings'], true);
@@ -308,7 +308,7 @@ class Alireza0 extends Base
     }
 
 
-    public function editClientTrafficByEmail(string $inboundId, string $email, int $gb)
+    public function editClientTrafficByEmail( $inboundId, string $email, int $gb)
     {
         $inboundData = $this->list(['id' => $inboundId])[0];
         $settings = json_decode($inboundData['settings'], true);
@@ -433,7 +433,7 @@ class Alireza0 extends Base
         return $this->delClient($inboundId, $uuid);
     }
 
-    public function removeClientByEmail(string $inboundId, string $email)
+    public function removeClientByEmail( $inboundId, string $email)
     {
         $inboundData = $this->list(['id' => $inboundId])[0];
         $settings = json_decode($inboundData['settings'], true);

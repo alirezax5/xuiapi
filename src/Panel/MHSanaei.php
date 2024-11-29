@@ -153,7 +153,7 @@ class MHSanaei extends Base
     }
 
 
-    public function editClientByEmail(string $inboundId, string $clientEmail, bool $enableClient, string $email, string $uuid, int $totalGB = 0, int $expiryTime = 0, string $tgId = '', string $subId = '', int $limitIp = 0, string $fingerprint = 'chrome', string $flow = '')
+    public function editClientByEmail( $inboundId, string $clientEmail, bool $enableClient, string $email, string $uuid, int $totalGB = 0, int $expiryTime = 0, string $tgId = '', string $subId = '', int $limitIp = 0, string $fingerprint = 'chrome', string $flow = '')
     {
         $inboundData = $this->list(['id' => $inboundId])[0];
         $settings = json_decode($inboundData['settings'], true);
@@ -203,39 +203,56 @@ class MHSanaei extends Base
         return $this->curl('updateInbound', $data, true);
     }
 
-    public function enableClient(string $inboundId, string $uuid)
+    public function enableClient($inboundId, $uuid)
     {
-        $inboundData = $this->list(['id' => $inboundId])[0];
-        $settings = json_decode($inboundData['settings'], true);
-
-        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
-        if ($cIndex === false) {
+        $list = $this->list(['id' => $inboundId])[0];
+        $protocol = $list['protocol'];
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndex($settingss['clients'], $uuid);
+        if ($cIndex === false)
             return false;
-        }
+        $settings = ['clients' => [[
+            'enable' => true,
+            $protocol == 'trojan' ? 'password' : 'id' => $uuid,
+            'email' => $settingss['clients'][$cIndex]['email'],
+            'flow' => $settingss['clients'][$cIndex]['flow'],
+            'totalGB' => $settingss['clients'][$cIndex]['totalGB'],
+            'expiryTime' => $settingss['clients'][$cIndex]['expiryTime'],
+            'limitIp' => $settingss['clients'][$cIndex]['limitIp'],
+            'fingerprint' => $settingss['clients'][$cIndex]['fingerprint'],
+            'tgId' => $settingss['clients'][$cIndex]['tgId'],
+            'subId' => $settingss['clients'][$cIndex]['subId']
 
-        $settings['clients'][$cIndex]['enable'] = true;
-
-        return $this->updateClient($inboundId, $settings['clients'][$cIndex][$inboundData['protocol'] === 'trojan' ? 'password' : 'id'], $settings);
+        ]]
+        ];
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
     }
 
-
-    public function enableClientByEmail(string $inboundId, string $email)
+    public function enableClientByEmail($inboundId, $email)
     {
-        $inboundData = $this->list(['id' => $inboundId])[0];
-        $settings = json_decode($inboundData['settings'], true);
-
-        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
-        if ($cIndex === false) {
+        $list = $this->list(['id' => $inboundId])[0];
+        $protocol = $list['protocol'];
+        $idKey = $protocol == 'trojan' ? 'password' : 'id';
+        $settingss = json_decode($list["settings"], true);
+        $cIndex = $this->getClientIndexByEmail($settingss['clients'], $email);
+        if ($cIndex === false)
             return false;
-        }
+        $settings = ['clients' => [[
+            'enable' => true,
+            $protocol == 'trojan' ? 'password' : 'id' => $settingss['clients'][$cIndex][$idKey],
+            'email' => $email,
+            'flow' => $settingss['clients'][$cIndex]['flow'],
+            'totalGB' => $settingss['clients'][$cIndex]['totalGB'],
+            'expiryTime' => $settingss['clients'][$cIndex]['expiryTime'],
+            'limitIp' => $settingss['clients'][$cIndex]['limitIp'],
+            'fingerprint' => $settingss['clients'][$cIndex]['fingerprint'],
+            'tgId' => $settingss['clients'][$cIndex]['tgId'],
+            'subId' => $settingss['clients'][$cIndex]['subId']
 
-        $settings['clients'][$cIndex]['enable'] = true;
-
-        return $this->updateClient(
-            $inboundId,
-            $settings['clients'][$cIndex][$inboundData['protocol'] === 'trojan' ? 'password' : 'id'],
-            $settings
-        );
+        ]]
+        ];
+        return $this->updateClient($inboundId, $settingss['clients'][$cIndex][$idKey], $settings);
     }
 
 
@@ -343,7 +360,7 @@ class MHSanaei extends Base
     }
 
 
-    public function editClientTrafficByEmail(string $inboundId, string $email, int $gb)
+    public function editClientTrafficByEmail( $inboundId, string $email, int $gb)
     {
         $inboundData = $this->list(['id' => $inboundId])[0];
         $settings = json_decode($inboundData['settings'], true);
@@ -388,7 +405,7 @@ class MHSanaei extends Base
         return $this->curl('resetClientTraffic');
     }
 
-    public function removeClientByEmail(string $inboundId, string $email)
+    public function removeClientByEmail( $inboundId, string $email)
     {
         $inboundData = $this->list(['id' => $inboundId])[0];
         $settings = json_decode($inboundData['settings'], true);
