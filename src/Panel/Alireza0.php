@@ -2,8 +2,12 @@
 
 namespace alirezax5\XuiApi\Panel;
 
+use alirezax5\XuiApi\Traits\Additions;
+
 class Alireza0 extends Base
 {
+    use Additions;
+
     public function getInbound($id)
     {
         return $this->request('getInbound', [], compact('id'));
@@ -68,18 +72,22 @@ class Alireza0 extends Base
     {
         return $this->request('resetClientTraffic', [], compact('id', 'email'));
     }
+
     public function resetAllTraffics()
     {
         return $this->request('resetAllTraffics');
     }
+
     public function resetAllClientTraffics($id)
     {
-        return $this->request('resetAllClientTraffics',[],compact('id'));
+        return $this->request('resetAllClientTraffics', [], compact('id'));
     }
+
     public function delDepletedClients($id)
     {
-        return $this->request('delDepletedClients',[],compact('id'));
+        return $this->request('delDepletedClients', [], compact('id'));
     }
+
     public function onlines()
     {
         return $this->request('onlines');

@@ -2,14 +2,13 @@
 
 namespace alirezax5\XuiApi\Traits;
 
-use alirezax5\XConvert\XConvert;
-use inc\functions;
 
 trait Additions
 {
-    public function list(array $filter = [])
+    public function list(array $filter = []): array|bool
     {
         $list = $this->listInbound();
+
         if (empty($list['obj'])) {
             return false;
         }
@@ -17,202 +16,44 @@ trait Additions
         if (empty($filter)) {
             return $list;
         }
-        $result = [];
-        foreach ($list['obj'] as $item) {
+
+        return array_filter($list['obj'], function ($item) use ($filter) {
             $settings = json_decode($item['settings'], true);
-
-            if ($this->doesItemMatchFilter($item, $settings, $filter)) {
-                $result[] = $item;
-            }
-        }
-
-        return $result;
+            return $this->doesItemMatchFilter($item, $settings, $filter);
+        });
     }
-
     private function doesItemMatchFilter(array $item, array $settings, array $filter): bool
     {
-        if (!empty($filter['id']) && $filter['id'] !== (int)$item['id']) {
-            return false;
-        }
-
-        if (!empty($filter['port']) && $filter['port'] !== (int)$item['port']) {
-            return false;
-        }
-
-        if (!empty($filter['uid']) && !$this->checkExistsUuidOnClients($settings['clients'], $filter['uid'])) {
-            return false;
-        }
-
-        if (!empty($filter['protocol']) && $filter['protocol'] !== $item['protocol']) {
-            return false;
-        }
-
-        return true;
+        return (!isset($filter['id']) || $filter['id'] === (int) $item['id'])
+            && (!isset($filter['port']) || $filter['port'] === (int) $item['port'])
+            && (!isset($filter['uid']) || $this->checkExistsUuidOnClients($settings['clients'], $filter['uid']))
+            && (!isset($filter['protocol']) || $filter['protocol'] === $item['protocol']);
     }
 
-    public function checkExistsUuidOnClients($clients, $uid)
+    public function checkExistsUuidOnClients(array $clients, string $uid): bool
     {
-        foreach ($clients as $client) {
-            $clientId = $client['password'] ?? $client['id'];
-            if ($uid == $clientId) {
-                return true;
-            }
-        }
-        return false;
+        return array_reduce($clients, fn($carry, $client) => $carry || ($uid === ($client['password'] ?? $client['id'])), false);
     }
 
 
-    public function getClientIndex($clients, $uid)
+    public function getClientIndex(array $clients, string $uid): int|bool
     {
         foreach ($clients as $index => $client) {
-            $clientId = $client['password'] ?? $client['id'];
-            if ($uid === $clientId) {
+            if ($uid === ($client['password'] ?? $client['id'])) {
                 return $index;
             }
         }
         return false;
     }
 
-
-    public function getClientIndexByEmail($clients, $email)
+    public function getClientIndexByEmail(array $clients, string $email): int|bool
     {
-        if (count($clients) == 0)
-            return false;
-        $i = 0;
-        foreach ($clients as $item) {
-            if ($email == $item['email'])
-                return (int)$i;
-            $i++;
+        foreach ($clients as $index => $item) {
+            if ($email === $item['email']) {
+                return $index;
+            }
         }
         return false;
-    }
-
-    public function editClientExpiryTime($id, $uuid, $expiryTime = 0)
-    {
-        $list = $this->list(['id' => $id])[0];
-        if (!$list) {
-            return false;
-        }
-
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
-        if ($cIndex === false) {
-            return false;
-        }
-        $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
-
-        return $this->editInbound(
-            (bool)$list['enable'], // Enable status
-            $id,
-            $list['remark'],
-            $list['port'],
-            $list['protocol'],
-            $settings,
-            json_decode($list['streamSettings']),
-            $list['total'],
-            $list['up'],
-            $list['down'],
-            json_decode($list['sniffing']),
-            $list['expiryTime'],
-            $list['listen']
-        );
-    }
-
-    public function editClientExpiryTimeByEmail($id, $email, $expiryTime = 0)
-    {
-        $list = $this->list(['id' => $id])[0];
-        if (!$list) {
-            return false;
-        }
-
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
-        if ($cIndex === false) {
-            return false;
-        }
-
-        $settings['clients'][$cIndex]['expiryTime'] = $expiryTime;
-
-        return $this->editInbound(
-            (bool)$list['enable'], // Enable status
-            $id,
-            $list['remark'],
-            $list['port'],
-            $list['protocol'],
-            $settings,
-            json_decode($list['streamSettings']),
-            $list['total'],
-            $list['up'],
-            $list['down'],
-            json_decode($list['sniffing']),
-            $list['expiryTime'],
-            $list['listen']
-        );
-    }
-
-
-    public function removeClient($id, $uuid)
-    {
-        $list = $this->list(['id' => $id])[0];
-        if (!$list) {
-            return false;
-        }
-
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndex($settings['clients'], $uuid);
-        if ($cIndex === false) {
-            return false;
-        }
-
-        unset($settings['clients'][$cIndex]);
-
-        return $this->editInbound(
-            (bool)$list['enable'],
-            $id,
-            $list['remark'],
-            $list['port'],
-            $list['protocol'],
-            $settings,
-            json_decode($list['streamSettings']),
-            $list['total'],
-            $list['up'],
-            $list['down'],
-            json_decode($list['sniffing']),
-            $list['expiryTime'],
-            $list['listen']
-        );
-    }
-
-    public function removeClientByEmail($id, $email)
-    {
-        $list = $this->list(['id' => $id])[0];
-        if (!$list) {
-            return false;
-        }
-
-        $settings = json_decode($list["settings"], true);
-        $cIndex = $this->getClientIndexByEmail($settings['clients'], $email);
-        if ($cIndex === false) {
-            return false;
-        }
-
-        unset($settings['clients'][$cIndex]);
-
-        return $this->editInbound(
-            (bool)$list['enable'],
-            $id,
-            $list['remark'],
-            $list['port'],
-            $list['protocol'],
-            $settings,
-            json_decode($list['streamSettings']),
-            $list['total'],
-            $list['up'],
-            $list['down'],
-            json_decode($list['sniffing']),
-            $list['expiryTime'],
-            $list['listen']
-        );
     }
 
 }

@@ -2,8 +2,11 @@
 
 namespace alirezax5\XuiApi\Panel;
 
+use alirezax5\XuiApi\Traits\Additions;
+
 class MHSanaei extends Base
 {
+    use Additions;
     public function getInbound($id)
     {
         return $this->request('getInbound', [], compact('id'));
