@@ -3,327 +3,118 @@
 namespace alirezax5\XuiApi\Panel;
 
 
-class Base
-{
-    protected $url, $username, $password, $id, $cookie, $client;
-    protected $path = [
-        'login' => '/login',
-        'status' => '/server/status',
-        'getConfigJson' => '/server/getConfigJson',
-        'getDb' => '/server/getDb',
-        'getNewX25519Cert' => '/server/getNewX25519Cert',
-        'restartXrayService' => '/server/restartXrayService',
-        'stopXrayService' => '/server/stopXrayService',
-        'getXrayVersion' => '/server/getXrayVersion',
-        'installXray' => '/server/installXray/{id}',
-        'logs' => '/server/logs',
-        'restartPanel' => '/setting/restartPanel',
-        'allSetting' => '/xui/setting/all',
-        'updateSetting' => '/xui/setting/update',
-        'updateUser' => '/xui/setting/updateUser',
-        'listInbound' => '/xui/inbound/list',
-        'inbound' => '/xui/inbound/get/{id}',
-        'delInbound' => '/xui/inbound/del/{id}',
-        'updateInbound' => '/xui/inbound/update/{id}',
-        'addInbound' => '/xui/inbound/add',
-        'addClient' => '/xui/inbound/addClient/',
-        'delClient' => '/xui/inbound/delClient/{id}',
-        'resetClientTraffic' => '/xui/inbound/{id}/resetClientTraffic/{client}',
-        'updateClient' => '/xui/inbound/updateClient/{id}',
-        'clientIps' => '/xui/inbound/clientIps/{id}',
-        'clearClientIps' => '/xui/clearClientIps/{id}',
-    ];
-    protected $defaults = [
-        'sniffing' => [
-            "enabled" => true,
-            "destOverride" => [
-                "http",
-                "tls",
-                "quic"
-            ]
-        ],
-    ];
-    protected $endpointWithId = ['delInbound', 'inbound', 'updateInbound', 'installXray', 'updateClient', 'clientIps', 'clearClientIps'];
-    protected $endpointWithClient = ['resetClientTraffic', 'delClient'];
+use alirezax5\XuiApi\Route\Route;
+use alirezax5\XuiApi\XuiApiException;
+use GuzzleHttp\Client as GuzzleClient;
+use GuzzleHttp\Cookie\FileCookieJar;
+use Psr\Http\Client\ClientInterface;
 
-    public function __construct($url, $username, $password)
+abstract class Base
+{
+    protected string $url;
+    protected string $username;
+    protected string $password;
+    protected ?string $id = null;
+    protected Route $route;
+    protected ?string $clientIdentifier = null;
+    protected ClientInterface $httpClient;
+    protected FileCookieJar $cookieJar;
+    protected string $cookieFilePath;
+
+    public function __construct(string $url, string $username, string $password, ?ClientInterface $httpClient = null, ?string $cookieFilePath = null)
     {
-        $this->url = $url;
-        $this->cookie = __DIR__ . DIRECTORY_SEPARATOR . "cookie.txt";
+        $this->url = rtrim($url, '/');
         $this->username = $username;
         $this->password = $password;
+        $this->httpClient = $httpClient ?? new GuzzleClient(['verify' => false]);
+
+        // Set default cookie file path to project root
+        $this->cookieFilePath = $cookieFilePath ?? dirname(__DIR__, 2) . '/xui_cookies.json';
+
+        // Check if the directory is writable
+        $cookieDir = dirname($this->cookieFilePath);
+        if (!is_dir($cookieDir) || !is_writable($cookieDir)) {
+            throw new XuiApiException("Cookie file directory '$cookieDir' is not writable.");
+        }
+        $this->cookieJar = new FileCookieJar($this->cookieFilePath, true);
+        $this->route = new Route();
     }
 
-    protected function curl($path, $body = [], $isPost = true)
+    protected function request(string $pathKey, array $body = [], array $params = []): array
     {
-        $ch = curl_init();
+        $route = $this->route->getRoute($pathKey, $params);
+        $url = $this->url . $route['path'];
         $options = [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_URL => $this->getUrl($path),
-            CURLOPT_USERAGENT => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
-            CURLOPT_FOLLOWLOCATION => true,
-            CURLOPT_COOKIEFILE => $this->getCookie(),
-            CURLOPT_COOKIEJAR => $this->getCookie(),
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_SSL_VERIFYHOST => false
+            'cookies' => $this->cookieJar,
+            'headers' => ['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36'],
         ];
 
-        if ($isPost) {
-            $options[CURLOPT_POST] = true;
-            $options[CURLOPT_CUSTOMREQUEST] = 'POST';
-            $options[CURLOPT_POSTFIELDS] = http_build_query($body);
-        } else {
-            $options[CURLOPT_CUSTOMREQUEST] = 'GET';
+        if ($route['method'] === 'POST') {
+            $options['form_params'] = $body;
         }
 
-        curl_setopt_array($ch, $options);
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        try {
+            $response = $this->httpClient->request($route['method'], $url, $options);
+            if ($response->getStatusCode() !== 200) {
+                throw new XuiApiException('HTTP error: ' . $response->getStatusCode());
+            }
+            $data = json_decode($response->getBody()->getContents(), true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                throw new XuiApiException('JSON decode error: ' . json_last_error_msg());
+            }
+            return $data;
+        } catch (\Throwable $e) {
+            throw new XuiApiException('Request failed: ' . $e->getMessage(), 0, $e);
+        }
+    }
 
-        // Error handling
-        if ($httpCode !== 200) {
-            // Handle error based on HTTP status code
-            throw new \Exception('Curl error: HTTP status code ' . $httpCode);
+    public function login(bool $force = false): void
+    {
+        // If force is true, clear the cookie file
+        if ($force) {
+            $this->cookieJar = new FileCookieJar($this->cookieFilePath, true);
         }
 
-        return json_decode($response, true);
-    }
+        // Check if existing cookies are valid by testing a simple request
+        if (!$force) {
+            try {
+                $testResponse = $this->request('status');
+                if (isset($testResponse['success']) && $testResponse['success']) {
+                    return;
+                }
+            } catch (XuiApiException $e) {
+                throw new XuiApiException('Request failed: ' . $e->getMessage(), 0, $e);
 
-    public function jsonEncode($json)
-    {
-        return json_encode($json, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-    }
-
-    protected function setId($id)
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    protected function getId()
-    {
-        return $this->id;
-    }
-
-    protected function setClient($client)
-    {
-        $this->client = $client;
-        return $this;
-    }
-
-    protected function getClient()
-    {
-        return $this->client;
-    }
-
-    protected function getUrl($path): string
-    {
-        if (!isset($this->path[$path])) {
-            return $this->url;
-        }
-
-        $urlPath = $this->path[$path];
-
-        if (in_array($path, $this->endpointWithId)) {
-            $urlPath = str_replace('{id}', $this->getId(), $urlPath);
-        }
-
-        if (in_array($path, $this->endpointWithClient)) {
-            $urlPath = str_replace(['{id}', '{client}'], [$this->getId(), $this->getClient()], $urlPath);
-        }
-
-        return $this->url . $urlPath;
-    }
-
-    public function setCookie($dir)
-    {
-        $this->cookie = $dir;
-        return $this;
-    }
-
-    public function getCookie()
-    {
-        return $this->cookie;
-    }
-
-    protected function initCookieFile()
-    {
-        if (!$this->checkCookieFile())
-            file_put_contents($this->cookie, '');
-
-        return $this;
-    }
-
-    protected function resetCookieFile()
-    {
-        if ($this->checkCookieFile())
-            unlink($this->cookie);
-
-        $this->initCookieFile();
-        return $this;
-    }
-
-    protected function checkCookieFile()
-    {
-        return file_exists($this->cookie);
-    }
-
-    public function login($force = false)
-    {
-        if ($force || !$this->checkCookieFile()) {
-            $this->resetCookieFile();
-            $response = $this->curl('login', ['username' => $this->username, 'password' => $this->password]);
-
-            if (!isset($response['success']) || !$response['success']) {
-                // Handle login error gracefully
-                throw new \Exception('Login failed');
             }
         }
+
+        // Perform login
+        $response = $this->request('login', ['username' => $this->username, 'password' => $this->password]);
+        if (!isset($response['success']) || !$response['success']) {
+            throw new XuiApiException('Login failed');
+        }
+
+        // Save cookies to file
+        $this->cookieJar->save($this->cookieFilePath);
     }
 
-    public function status()
+    public function status(): array
     {
-        return $this->curl('status', [], true);
+        return $this->request('status');
     }
 
-    public function getXrayVersion()
+    public function restartXrayService(): array
     {
-        return $this->curl('getXrayVersion', [], true);
-    }
-
-    public function restartPanel()
-    {
-        return $this->curl('restartPanel', [], true);
-    }
-
-    public function installXray($version = 'v1.6.4')
-    {
-        $this->setId($version);
-        return $this->curl('installXray', compact('version'), true);
-    }
-
-    public function restartXrayService()
-    {
-        return $this->curl('restartXrayService', [], true);
+        return $this->request('restartXrayService');
     }
 
     public function stopXrayService()
     {
-        return $this->curl('stopXrayService', [], true);
+        return $this->request('stopXrayService');
     }
-
-    public function startXrayService()
-    {
-        return $this->curl('restartXrayService', [], true);
-    }
-
-
     public function listInbound()
     {
-        return $this->curl('listInbound', [], true);
+        return $this->request('listInbound');
     }
-
-    public function allSetting()
-    {
-        return $this->curl('allSetting', [], true);
-    }
-
-
-    public function updateUser($oldUsername, $oldPassword, $newUsername, $newPassword)
-    {
-        return $this->curl('updateUser', compact('oldPassword', 'oldUsername', 'newPassword', 'newUsername'), true);
-    }
-
-    public function editInboundDataWithKey($id, $key, $value)
-    {
-        $list = $this->list(['id' => $id])[0];
-
-        if (isset($list[$key])) {
-            $list[$key] = $value;
-            return $this->editInbound(
-                (bool)$list['enable'],
-                $id,
-                $list['remark'],
-                $list['port'],
-                $list['protocol'],
-                json_decode($list['settings'], true),
-                json_decode($list['streamSettings']),
-                $list['total'],
-                $list['up'],
-                $list['down'],
-                json_decode($list['sniffing']),
-                $list['expiryTime'],
-                $list['listen']
-            );
-        }
-
-        return false; // Or throw an exception if the key doesn't exist
-    }
-
-    public function removeInbound($id)
-    {
-        $this->setId($id);
-        return $this->curl('delInbound', [], true);
-    }
-
-    public function editClientWithKey($inboundId, $clientUuid, $key, $value)
-    {
-        $inboundData = $this->list(['id' => $inboundId])[0];
-        $settings = json_decode($inboundData['settings'], true);
-
-        $cIndex = $this->getClientIndex($settings['clients'], $clientUuid);
-        if ($cIndex === false) {
-            return false;
-        }
-
-        $settings['clients'][$cIndex][$key] = $value;
-
-        return $this->editInbound(
-            (bool)$inboundData['enable'],
-            $inboundId,
-            $inboundData['remark'],
-            $inboundData['port'],
-            $inboundData['protocol'],
-            $settings,
-            json_decode($inboundData['streamSettings']),
-            $inboundData['total'],
-            $inboundData['up'],
-            $inboundData['down'],
-            json_decode($inboundData['sniffing']),
-            $inboundData['expiryTime'],
-            $inboundData['listen']
-        );
-    }
-
-    public function editClientByEmailWithKey($inboundId, $clientEmail, $key, $value)
-    {
-        $inboundData = $this->list(['id' => $inboundId])[0];
-        $settings = json_decode($inboundData['settings'], true);
-
-        $cIndex = $this->getClientIndexByEmail($settings['clients'], $clientEmail);
-        if ($cIndex === false) {
-            return false;
-        }
-
-        $settings['clients'][$cIndex][$key] = $value;
-
-        return $this->editInbound(
-            (bool)$inboundData['enable'],
-            $inboundId,
-            $inboundData['remark'],
-            $inboundData['port'],
-            $inboundData['protocol'],
-            $settings,
-            json_decode($inboundData['streamSettings']),
-            $inboundData['total'],
-            $inboundData['up'],
-            $inboundData['down'],
-            json_decode($inboundData['sniffing']),
-            $inboundData['expiryTime'],
-            $inboundData['listen']
-        );
-    }
-
 
 }
