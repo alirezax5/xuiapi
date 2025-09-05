@@ -70,32 +70,33 @@ abstract class Base
 
     public function login(bool $force = false): void
     {
-        // If force is true, clear the cookie file
-        if ($force) {
-            $this->cookieJar = new FileCookieJar($this->cookieFilePath, true);
-        }
+        $this->cookieJar = new FileCookieJar($this->cookieFilePath, $force);
 
-        // Check if existing cookies are valid by testing a simple request
         if (!$force) {
             try {
                 $testResponse = $this->request('status');
                 if (isset($testResponse['success']) && $testResponse['success']) {
-                    return;
+                    return; 
                 }
             } catch (XuiApiException $e) {
-                throw new XuiApiException('Request failed: ' . $e->getMessage(), 0, $e);
-
             }
         }
 
-        // Perform login
-        $response = $this->request('login', ['username' => $this->username, 'password' => $this->password]);
-        if (!isset($response['success']) || !$response['success']) {
-            throw new XuiApiException('Login failed');
-        }
+        try {
+            $response = $this->request('login', [
+                'username' => $this->username,
+                'password' => $this->password,
+            ]);
 
-        // Save cookies to file
-        $this->cookieJar->save($this->cookieFilePath);
+            if (!isset($response['success']) || !$response['success']) {
+                throw new XuiApiException('Login failed: Invalid response');
+            }
+
+            // Save new cookies to the cookie jar
+            $this->cookieJar->save($this->cookieFilePath);
+        } catch (XuiApiException $e) {
+            throw new XuiApiException('Login failed: ' . $e->getMessage(), 0, $e);
+        }
     }
 
     public function status(): array

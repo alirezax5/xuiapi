@@ -1,11 +1,27 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
-$xui = new \alirezax5\XuiApi\Panel\Vaxilu('YOU_PANEL_URL', 'YOU_PANEL_USERNAME', 'YOU_PANEL_PASSWORD');
-$xui->setCookie(__DIR__.'/a.txt');
+$xui = new \alirezax5\XuiApi\Panel\MHSanaei('YOU_PANEL_URL', 'YOU_PANEL_USERNAME', 'YOU_PANEL_PASSWORD');
 $xui->login();
 
-var_dump($xui->addnewClient('inbound id[int]','uuid or password[string]','email[string]','subId[string]','tgid[string]','flow[string]','traffic[int Gb]','time_ms[big int]','limitIp[int]','fingerprint[string]','isTrojan[bool]'));
+//normal
+$body = [
+    'id' => 5,
+    'settings' => '{"clients": [{"id": "bbfad557-28f2-47e5-9f3d-e3c7f532fbda","flow": "","email": "dp1plmlt8","limitIp": 0,"totalGB": 0,"expiryTime": 0,"enable": true,"tgId": "","subId": "2rv0gb458kbfl532","reset": 0}]}'
+];
+$xui->addClient($body);
+
+//dto
+
+$dto = new \alirezax5\XuiApi\DTO\addClientDto();
+$dto->id = 5;
+$dto->settings = '{"clients": [{"id": "bbfad557-28f2-47e5-9f3d-e3c7f532fbda","flow": "","email": "dp1plmlt8","limitIp": 0,"totalGB": 0,"expiryTime": 0,"enable": true,"tgId": "","subId": "2rv0gb458kbfl532","reset": 0}]}';
+$xui->addClient($dto->toArray());
+
+//builder
+$builder = new \alirezax5\XuiApi\Builder\addClientBuilder();
+$array = $builder->setId(5)->setSettings('{"clients": [{"id": "bbfad557-28f2-47e5-9f3d-e3c7f532fbda","flow": "","email": "dp1plmlt8","limitIp": 0,"totalGB": 0,"expiryTime": 0,"enable": true,"tgId": "","subId": "2rv0gb458kbfl532","reset": 0}]}')->build();
+$xui->addClient($array);
 
 
-// php 8
-$xui->addnewClient(id:123,uuid: 'uuid',email: 'email',totalgb: 0,eT: 0);
+
+

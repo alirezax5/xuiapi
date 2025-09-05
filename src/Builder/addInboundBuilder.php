@@ -72,19 +72,19 @@ class addInboundBuilder
         return $this;
     }
 
-    public function setSettings(array $settings): self
+    public function setSettings( $settings): self
     {
         $this->settings = $settings;
         return $this;
     }
 
-    public function setStreamSettings(array $streamSettings): self
+    public function setStreamSettings( $streamSettings): self
     {
         $this->streamSettings = $streamSettings;
         return $this;
     }
 
-    public function setSniffing(?array $sniffing): self
+    public function setSniffing( $sniffing): self
     {
         $this->sniffing = $sniffing;
         return $this;

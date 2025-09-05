@@ -1,18 +1,27 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
 $xui = new \alirezax5\XuiApi\Panel\MHSanaei('YOU_PANEL_URL', 'YOU_PANEL_USERNAME', 'YOU_PANEL_PASSWORD');
-$xui->setCookie(__DIR__.'/a.txt');
 $xui->login();
 
-$xui->editClient('inbound id[int]','uuid or password[string]','email[string]','uuid or password[string]','traffic[int Gb]','time_ms[big int]','tgId !just MHSanaei panel[string]','subId !just MHSanaei panel [string]','limitIp[int]','fingerprint[string]','flow[string]');
+//normal
+$body = [
+    'id' => 5,
+    'settings' => '{"clients": [{"id": "bbfad557-28f2-47e5-9f3d-e3c7f532fbda","flow": "","email": "dp1plmlt8","limitIp": 0,"totalGB": 0,"expiryTime": 0,"enable": true,"tgId": "","subId": "2rv0gb458kbfl532","reset": 0}]}'
+];
+$xui->updateClient('uuid or password[string]', $body);
 
-$xui->editClientByEmail('inbound id[int]','email[string]','email[string]','uuid or password[string]','traffic[int Gb]','time_ms[big int]','tgId !just MHSanaei panel [string]','subId !just MHSanaei panel [string]','limitIp[int]','fingerprint[string]','flow[string]');
+//dto
 
-$xui->editClientWithKey('inbound id[int]','uuid or password[string]','key[string]','value');
+$dto = new \alirezax5\XuiApi\DTO\updateClient();
+$dto->id = 5;
+$dto->settings = '{"clients": [{"id": "bbfad557-28f2-47e5-9f3d-e3c7f532fbda","flow": "","email": "dp1plmlt8","limitIp": 0,"totalGB": 0,"expiryTime": 0,"enable": true,"tgId": "","subId": "2rv0gb458kbfl532","reset": 0}]}';
+$xui->updateClient('uuid or password[string]', $dto->toArray());
 
-$xui->editClientByEmailWithKey('inbound id[int]','email[string]','key[string]','value');
+//builder
+$builder = new \alirezax5\XuiApi\Builder\updateClientBuilder();
+$array = $builder->setId(5)->setSettings('{"clients": [{"id": "bbfad557-28f2-47e5-9f3d-e3c7f532fbda","flow": "","email": "dp1plmlt8","limitIp": 0,"totalGB": 0,"expiryTime": 0,"enable": true,"tgId": "","subId": "2rv0gb458kbfl532","reset": 0}]}')->build();
+$xui->updateClient('uuid or password[string]', $array);
 
 
-//exampel for editClientByEmailWithKey:
 
-$xui->editClientByEmailWithKey(1,'alirezax5','email','newEmail');
+
