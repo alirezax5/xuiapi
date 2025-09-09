@@ -8,6 +8,21 @@ class Alireza0 extends Base
 {
     use Additions;
 
+    public function status(): array
+    {
+        return $this->request('status');
+    }
+
+    public function restartXrayService(): array
+    {
+        return $this->request('restartXrayService');
+    }
+
+    public function stopXrayService()
+    {
+        return $this->request('stopXrayService');
+    }
+
     public function getInbound($id)
     {
         return $this->request('getInbound', [], compact('id'));

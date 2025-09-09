@@ -99,20 +99,7 @@ abstract class Base
         }
     }
 
-    public function status(): array
-    {
-        return $this->request('status');
-    }
 
-    public function restartXrayService(): array
-    {
-        return $this->request('restartXrayService');
-    }
-
-    public function stopXrayService()
-    {
-        return $this->request('stopXrayService');
-    }
     public function listInbound()
     {
         return $this->request('listInbound');
