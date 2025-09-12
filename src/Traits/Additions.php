@@ -2,10 +2,10 @@
 
 namespace alirezax5\XuiApi\Traits;
 
-
 trait Additions
 {
-    public function list(array $filter = []): array|bool
+
+    public function list(array $filter = [])
     {
         $list = $this->listInbound();
 
@@ -17,43 +17,130 @@ trait Additions
             return $list;
         }
 
-        return array_filter($list['obj'], function ($item) use ($filter) {
-            $settings = json_decode($item['settings'], true);
-            return $this->doesItemMatchFilter($item, $settings, $filter);
-        });
+        return array_filter($list['obj'], fn($item) => $this->doesItemMatchFilter(
+            $item,
+            json_decode($item['settings'], true) ?? [],
+            $filter
+        ));
     }
-    private function doesItemMatchFilter(array $item, array $settings, array $filter): bool
+
+    private function doesItemMatchFilter(array $item, array $settings, array $filter)
     {
-        return (!isset($filter['id']) || $filter['id'] === (int) $item['id'])
-            && (!isset($filter['port']) || $filter['port'] === (int) $item['port'])
-            && (!isset($filter['uid']) || $this->checkExistsUuidOnClients($settings['clients'], $filter['uid']))
+        return (!isset($filter['id']) || $filter['id'] === (int)$item['id'])
+            && (!isset($filter['port']) || $filter['port'] === (int)$item['port'])
+            && (!isset($filter['uid']) || $this->checkExistsUuidOnClients($settings['clients'] ?? [], $filter['uid']))
             && (!isset($filter['protocol']) || $filter['protocol'] === $item['protocol']);
     }
 
-    public function checkExistsUuidOnClients(array $clients, string $uid): bool
+
+    public function checkExistsUuidOnClients(array $clients, string $uid)
     {
-        return array_reduce($clients, fn($carry, $client) => $carry || ($uid === ($client['password'] ?? $client['id'])), false);
+        foreach ($clients as $client) {
+            if ($uid === ($client['password'] ?? $client['id'] ?? '')) {
+                return true;
+            }
+        }
+        return false;
     }
 
 
-    public function getClientIndex(array $clients, string $uid): int|bool
+    private function getClientIndexBy(array $clients, string $identifier, string $key = 'id')
     {
         foreach ($clients as $index => $client) {
-            if ($uid === ($client['password'] ?? $client['id'])) {
+            $compare = $key === 'id' ? ($client['password'] ?? $client['id'] ?? '') : $client[$key];
+            if ($identifier === $compare) {
                 return $index;
             }
         }
         return false;
     }
 
-    public function getClientIndexByEmail(array $clients, string $email): int|bool
+
+    private function updateClientSettings(int $inboundId, string $identifier, string $key, array $updates)
     {
-        foreach ($clients as $index => $item) {
-            if ($email === $item['email']) {
-                return $index;
-            }
+        $inboundData = $this->list(['id' => $inboundId])[0] ?? null;
+        if (!$inboundData) {
+            return false;
         }
-        return false;
+
+        $settings = json_decode($inboundData['settings'], true) ?? [];
+        $index = $this->getClientIndexBy($settings['clients'] ?? [], $identifier, $key);
+
+        if ($index === false) {
+            return false;
+        }
+
+        foreach ($updates as $field => $value) {
+            $settings['clients'][$index][$field] = $value;
+        }
+
+        $clientId = $settings['clients'][$index][$inboundData['protocol'] === 'trojan' ? 'password' : 'id'] ?? '';
+
+        return $this->updateClient($clientId, [
+            'id' => $inboundId,
+            'settings' => json_encode($settings)
+        ]);
     }
 
+
+    public function removeClientByEmail(int $inboundId, string $email)
+    {
+        $inboundData = $this->list(['id' => $inboundId])[0] ?? null;
+        if (!$inboundData) {
+            return false;
+        }
+
+        $settings = json_decode($inboundData['settings'], true) ?? [];
+        $index = $this->getClientIndexBy($settings['clients'] ?? [], $email, 'email');
+
+        if ($index === false) {
+            return false;
+        }
+
+        $clientId = $settings['clients'][$index][$inboundData['protocol'] === 'trojan' ? 'password' : 'id'] ?? '';
+
+        return $this->delClient($inboundId, $clientId);
+    }
+
+
+    public function resetClientTrafficByUuid(int $inboundId, string $uuid)
+    {
+        $inboundData = $this->list(['id' => $inboundId])[0] ?? null;
+        if (!$inboundData) {
+            return false;
+        }
+
+        $settings = json_decode($inboundData['settings'], true) ?? [];
+        $index = $this->getClientIndexBy($settings['clients'] ?? [], $uuid);
+
+        if ($index === false) {
+            return false;
+        }
+
+        return $this->resetClientTraffic($inboundId, $settings['clients'][$index]['email'] ?? '');
+    }
+
+
+    public function editClientTrafficByEmail(int $inboundId, string $email, int $gb)
+    {
+        return $this->updateClientSettings($inboundId, $email, 'email', ['totalGB' => $gb]);
+    }
+
+
+    public function editClientTraffic(int $inboundId, string $uuid, int $gb)
+    {
+        return $this->updateClientSettings($inboundId, $uuid, 'id', ['totalGB' => $gb]);
+    }
+
+
+    public function editClientExpiryTime(int $inboundId, string $uuid, int $expiryTime)
+    {
+        return $this->updateClientSettings($inboundId, $uuid, 'id', ['expiryTime' => $expiryTime]);
+    }
+
+
+    public function editClientExpiryTimeByEmail(int $inboundId, string $email, int $expiryTime)
+    {
+        return $this->updateClientSettings($inboundId, $email, 'email', ['expiryTime' => $expiryTime]);
+    }
 }

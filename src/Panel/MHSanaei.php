@@ -38,12 +38,12 @@ class MHSanaei extends Base
         return $this->request('addInbound', $body);
     }
 
-    public function delInbound(int $id)
+    public function delInbound( $id)
     {
         return $this->request('delInbound', [], compact('id'));
     }
 
-    public function updateInbound(int $id)
+    public function updateInbound( $id)
     {
         return $this->request('updateInbound', [], compact('id'));
     }
@@ -70,7 +70,7 @@ class MHSanaei extends Base
 
     public function updateClient($clientId, array $body)
     {
-        return $this->request('updateClient', $body, compact($clientId));
+        return $this->request('updateClient', $body, compact('clientId'));
     }
 
     public function resetClientTraffic($id, $email)
