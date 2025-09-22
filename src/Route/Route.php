@@ -57,6 +57,9 @@ class Route
             'logs' => ['path' => '/panel/api/server/logs/{count}', 'method' => 'POST'],
             'xraylogs' => ['path' => '/panel/api/server/xraylogs/{count}', 'method' => 'POST'],
             'xraylogsgetNewEchCert' => ['path' => '/panel/api/server/getNewEchCert', 'method' => 'POST'],
+            'lastOnline' => ['path' => '/panel/api/inbounds/lastOnline', 'method' => 'POST'],
+            'updateClientTraffic' => ['path' => '/panel/api/inbounds/updateClientTraffic/{email}', 'method' => 'POST'],
+            'delClientByEmail' => ['path' => '/panel/api/inbounds/{id}/delClientByEmail/{email}', 'method' => 'POST'],
         ];
     }
 

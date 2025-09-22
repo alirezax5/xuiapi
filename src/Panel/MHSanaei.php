@@ -38,12 +38,12 @@ class MHSanaei extends Base
         return $this->request('addInbound', $body);
     }
 
-    public function delInbound( $id)
+    public function delInbound($id)
     {
         return $this->request('delInbound', [], compact('id'));
     }
 
-    public function updateInbound( $id)
+    public function updateInbound($id)
     {
         return $this->request('updateInbound', [], compact('id'));
     }
@@ -181,5 +181,20 @@ class MHSanaei extends Base
     public function getNewEchCert($count = 50)
     {
         return $this->request('getNewEchCert', [], compact('count'));
+    }
+
+    public function lastOnline()
+    {
+        return $this->request('lastOnline');
+    }
+
+    public function updateClientTraffic($email)
+    {
+        return $this->request('updateClientTraffic', compact('email'));
+    }
+
+    public function delClientByEmail($id, $email)
+    {
+        return $this->request('delClientByEmail', compact('id', 'email'));
     }
 }
