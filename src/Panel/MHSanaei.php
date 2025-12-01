@@ -195,6 +195,6 @@ class MHSanaei extends Base
 
     public function delClientByEmail($id, $email)
     {
-        return $this->request('delClientByEmail', compact('id', 'email'));
+        return $this->request('delClientByEmail',[], compact('id', 'email'));
     }
 }
